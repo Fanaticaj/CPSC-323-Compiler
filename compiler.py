@@ -11,6 +11,7 @@ def main():
 
     sourceFile = open(str(parser.parse_args().source_code[0]), 'r')
     sourceCode = sourceFile.read()
+    print(sourceCode)
     l = lexer.Lexer(sourceCode)
     l.validate()
 
