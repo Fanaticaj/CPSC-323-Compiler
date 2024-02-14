@@ -10,9 +10,10 @@ def main():
                     nargs=1, default=defaultSourceFile)
 
     sourceFile = open(str(parser.parse_args().source_code[0]), 'r')
-    lines = sourceFile.readlines()
-    for line in lines:
-        print(line)
+    sourceCode = sourceFile.read()
+    l = lexer.Lexer(sourceCode)
+    l.validate()
+
 
 if __name__ == "__main__":
     main()
