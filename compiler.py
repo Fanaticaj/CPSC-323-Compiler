@@ -13,7 +13,7 @@ def main():
     sourceCode = sourceFile.read()
     print(sourceCode)
     l = lexer.Lexer(sourceCode)
-    l.validate()
+    print(l.tokenize())
 
 
 if __name__ == "__main__":

@@ -1,7 +1,5 @@
 import re
 
-# regex for validating the identifier: ^[A-Za-z][A-Za-z0-9_]*$
-
 class Lexer:
     symbols = {
         #---------- Keywords ----------#
@@ -40,14 +38,30 @@ class Lexer:
         '!='        : 'operator',
         '=='        : 'operator',
         #---------- Operator ----------#
-
     }
 
     def __init__(self, sourceCode):
         self.sourceCode = sourceCode
+        self.tokens = []
     
-    # validate: This function is used to validate the source code
-    # Parameters: sourceCode - String - This will be the code from the RAT24S file.
+    # tokenize: This function is used to validate and tokenize the source code
+    # Parameters:
     # This will be called from the compiler.py file
-    def validate(sourceCode):
-        print('validate')
+    def tokenize(self):
+        # Split source code into tokens
+        potentialTokens = re.split('(\W)', self.sourceCode)
+        
+        # Filter out empty strings and whitespace-only strings
+        potentialTokens = [token for token in potentialTokens if token.strip() != '']
+
+        for token in potentialTokens:
+            if token in self.symbols:
+                self.tokens.append((self.symbols[token], token))
+            elif re.match('^[A-Za-z][A-Za-z0-9_]*$', token):
+                self.tokens.append(('identifier', token))
+            elif re.match('^\d+$', token):
+                self.tokens.append(('integer', token))
+            elif re.match('^\d+\.\d+$', token):
+                self.tokens.append(('real', token))
+            
+        return self.tokens
