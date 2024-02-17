@@ -27,15 +27,17 @@ class Lexer:
         ';'         : 'separator',
         #---------- Separators ----------#
         #---------- Operator ----------#
-        '::='       : 'operator',
-        '$'         : 'operator',
-        '|'         : 'operator',
+        '+'        : 'operator',
+        '-'        : 'operator',
+        '*'        : 'operator',
+        '/'        : 'operator',
+        '='        : 'operator',
+        '=='        : 'operator',
+        '!='        : 'operator',
         '<'         : 'operator',
         '>'         : 'operator',
         '<='        : 'operator',
         '>='        : 'operator',
-        '!='        : 'operator',
-        '=='        : 'operator',
         #---------- Operator ----------#
     }
 
