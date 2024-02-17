@@ -1,0 +1,19 @@
+[* Valid identifiers *]
+
+abc123 = 1
+testIdentifier = 1
+variable_1 = 1
+ExampleVariable = 1
+number2var = 1
+valid_variable_name = 1
+AnotherTest = 1
+
+[* Invalid keywords *]
+
+_underscoreStar = 1
+3digitStart = 1
+!notValid = 1
+-noLeadingLetter = 1
+*my_pointer = 1
+#hashtag = 1
+@at_symbol = 1
