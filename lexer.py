@@ -1,5 +1,7 @@
 import re
 
+from parse_token import Token
+
 class Lexer:
     symbols = {
         #---------- Keywords ----------#
@@ -57,12 +59,12 @@ class Lexer:
 
         for token in potentialTokens:
             if token in self.symbols:
-                self.tokens.append((self.symbols[token], token))
+                self.tokens.append(Token(self.symbols[token], token))
             elif re.match('^[A-Za-z][A-Za-z0-9_]*$', token):
-                self.tokens.append(('identifier', token))
+                self.tokens.append(Token('identifier', token))
             elif re.match('^\d+$', token):
-                self.tokens.append(('integer', token))
+                self.tokens.append(Token('integer', token))
             elif re.match('^\d+\.\d+$', token):
-                self.tokens.append(('real', token))
+                self.tokens.append(Token('real', token))
 
         return self.tokens
