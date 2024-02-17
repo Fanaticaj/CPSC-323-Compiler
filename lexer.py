@@ -18,12 +18,11 @@ class Lexer:
         'false'     : 'keyword',
         #---------- Keywords ----------#
         #---------- Separators ----------#
+        '$'         : 'separator',
         '('         : 'separator',
         ')'         : 'separator',
         '{'         : 'separator',
         '}'         : 'separator',
-        '['         : 'separator',
-        ']'         : 'separator',
         ','         : 'separator',
         ';'         : 'separator',
         #---------- Separators ----------#
@@ -43,14 +42,14 @@ class Lexer:
     def __init__(self, sourceCode):
         self.sourceCode = sourceCode
         self.tokens = []
-    
+
     # tokenize: This function is used to validate and tokenize the source code
     # Parameters:
     # This will be called from the compiler.py file
     def tokenize(self):
         # Split source code into tokens
         potentialTokens = re.split('(\W)', self.sourceCode)
-        
+
         # Filter out empty strings and whitespace-only strings
         potentialTokens = [token for token in potentialTokens if token.strip() != '']
 
@@ -63,5 +62,5 @@ class Lexer:
                 self.tokens.append(('integer', token))
             elif re.match('^\d+\.\d+$', token):
                 self.tokens.append(('real', token))
-            
+
         return self.tokens
