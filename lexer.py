@@ -52,7 +52,8 @@ class Lexer:
     # This will be called from the compiler.py file
     def tokenize(self):
         # Split source code into tokens
-        potentialTokens = re.split('(\W)', self.sourceCode)
+        re_separators = r'(?=[\(\)\{\}\,\;\$\s])|(?<=[\(\)\{\}\,\;\$\s])'
+        potentialTokens = re.split(re_separators, self.sourceCode)
 
         # Filter out empty strings and whitespace-only strings
         potentialTokens = [token for token in potentialTokens if token.strip() != '']
