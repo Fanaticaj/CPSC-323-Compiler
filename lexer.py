@@ -79,5 +79,7 @@ class Lexer:
                 self.tokens.append(Token('integer', token))
             elif re.match('^\d+\.\d+$', token):
                 self.tokens.append(Token('real', token))
+            else:
+                self.tokens.append(Token('invalid', token))
 
         return self.tokens

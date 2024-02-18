@@ -18,8 +18,13 @@ def main():
         print('='*80, '\n')
         l = Lexer(sourceCode)
         tokens = l.tokenize()
-        print(f"Token count: {len(tokens)}\n")
-        print(tokens)
+        valid_tokens = [token for token in tokens if token.type != 'invalid']
+        invalid_tokens = [token for token in tokens if token.type == 'invalid']
+        print(f"Token count: {len(valid_tokens)}\n")
+        print(valid_tokens)
+        if len(invalid_tokens):
+            print(f"\nInvalid Token count: {len(invalid_tokens)}\n")
+            print(invalid_tokens)
 
 if __name__ == "__main__":
     main()
