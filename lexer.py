@@ -64,11 +64,10 @@ class Lexer:
         self.sourceCode = re.sub(re_comments, '', self.sourceCode)
 
         # Split source code into tokens
-        re_separators = r'(?=[\(\)\{\}\,\;\$\s])|(?<=[\(\)\{\}\,\;\$\s])'
-        potentialTokens = re.split(re_separators, self.sourceCode)
-
-        # Filter out empty strings and whitespace-only strings
-        potentialTokens = [token for token in potentialTokens if token.strip() != '']
+        re_operators = r'==|!=|<=|>=|\+|\-|\*|\/|<|>|='
+        re_separators = r'\(|\)|\{|\}|\,|\;|\$|\s'
+        re_split_pattern = f'({re_operators})|({re_separators})'
+        potentialTokens = [token for token in re.split(re_split_pattern, self.sourceCode) if token and not token.isspace()]
 
         for token in potentialTokens:
             if token in self.symbols:
