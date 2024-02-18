@@ -3,3 +3,5 @@
 [* This is a multiline comment
 that spans three rows. All three
 rows will be ignored by the compiler. *]
+
+[*No space*]

@@ -1,3 +1,6 @@
+[* this is comment for this sample code which
+converts Fahrenheit into Celcius *]
+
 $
 function convertx (fahr integer)
 {

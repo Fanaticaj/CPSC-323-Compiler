@@ -47,10 +47,22 @@ class Lexer:
         self.sourceCode = sourceCode
         self.tokens = []
 
-    # tokenize: This function is used to validate and tokenize the source code
-    # Parameters:
-    # This will be called from the compiler.py file
     def tokenize(self):
+        """
+        This function is used to validate and tokenize the source code.
+        This will be called from the compiler.py file.
+
+        Parameters:
+        None
+
+	Returns:
+	list: A list of tokens identified in the source code.
+        """
+
+	# Remove comments from source code
+        re_comments = r'\[\*[\s\S]*?\*\]'
+        self.sourceCode = re.sub(re_comments, '', self.sourceCode)
+
         # Split source code into tokens
         re_separators = r'(?=[\(\)\{\}\,\;\$\s])|(?<=[\(\)\{\}\,\;\$\s])'
         potentialTokens = re.split(re_separators, self.sourceCode)
