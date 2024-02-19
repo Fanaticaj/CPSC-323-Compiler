@@ -82,3 +82,27 @@ class Lexer:
                 self.tokens.append(Token('invalid', token))
 
         return self.tokens
+
+    def print_tokens(self):
+        """
+        Print all tokens in the same structure as the source code
+        Each token should be printed like this: <token_type='token_value'>
+        For example: <integer='123'>
+        """
+        lines = self.sourceCode.split('\n')
+        token_count_per_line = []
+        for line in lines:
+            re_operators = r'==|!=|<=|>=|\+|\-|\*|\/|<|>|='
+            re_separators = r'\(|\)|\{|\}|\,|\;|\$|\s'
+            re_split_pattern = f'({re_operators})|({re_separators})'
+            potentialTokens = [token for token in re.split(re_split_pattern, line) if token and not token.isspace()]
+            if potentialTokens:
+                token_count_per_line.append(len(potentialTokens))
+        current_token = 0
+        for token_count in token_count_per_line:
+            for i in range(token_count):
+                curr_token = self.tokens[current_token]
+                formatted_str = f"<{curr_token.type}='{curr_token.value}'>"
+                print(formatted_str, end=" ")
+                current_token += 1
+            print()
