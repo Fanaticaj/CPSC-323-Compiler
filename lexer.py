@@ -13,6 +13,7 @@ class Lexer:
         'else'      : 'keyword',
         'endif'     : 'keyword',
         'while'     : 'keyword',
+        'endwhile'  : 'keyword',
         'return'    : 'keyword',
         'scan'      : 'keyword',
         'print'     : 'keyword',
