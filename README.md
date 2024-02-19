@@ -27,7 +27,7 @@ boolean		else		endif
 false		function	if
 integer		print		real
 return		scan		true
-while
+while		endwhile
 ```
 
 ### 1.4 Integers
