@@ -1,5 +1,6 @@
 import re
 
+from fsm import FSM
 from parse_token import Token
 
 class Lexer:
@@ -70,6 +71,8 @@ class Lexer:
         re_split_pattern = f'({re_operators})|({re_separators})'
         potentialTokens = [token for token in re.split(re_split_pattern, self.sourceCode) if token and not token.isspace()]
 
+        token_checker_fsm = FSM()
+
         for token in potentialTokens:
             if token in self.symbols:
                 self.tokens.append(Token(self.symbols[token], token))
@@ -77,7 +80,7 @@ class Lexer:
                 self.tokens.append(Token('identifier', token))
             elif re.match('^\d+$', token):
                 self.tokens.append(Token('integer', token))
-            elif re.match('^\d+\.\d+$', token):
+            elif token_checker_fsm.is_real(token):
                 self.tokens.append(Token('real', token))
             else:
                 self.tokens.append(Token('invalid', token))
