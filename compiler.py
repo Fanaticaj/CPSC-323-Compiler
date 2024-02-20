@@ -25,7 +25,8 @@ def main():
     tokens = l.tokenize()
 
     # Print tokens returned by lexer
-    print('='*32, f" Tokens ({len(tokens)}) ", '='*33)
+    token_count = len([token for token in tokens if token.type != 'invalid'])
+    print('='*32, f" Tokens ({token_count}) ", '='*33)
     l.print_tokens()
     print('='*80, '\n')
 
