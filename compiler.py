@@ -1,9 +1,11 @@
 import argparse
 import os
+from pathlib import Path
 
 from lexer import Lexer
 
 defaultSourceFile = './RAT24S_programs/RAT24S.source'
+tokenOutputExt = '_tokens.txt'
 
 def print_source_code(sourceCode):
     """Print the source code used by the compiler"""
@@ -33,10 +35,15 @@ def main():
     parser.add_argument('-t', '--print-tokens', action='store_true',
                     default=False, help="print tokens returned by lexer")
 
+    # Arg to specify output file (optional)
+    parser.add_argument('-o', '--output', action='store', default=None,
+                    help="Specify output file")
+
     # Parse arguments
-    path = parser.parse_args().source_code
+    path = Path(parser.parse_args().source_code)
     print_all = parser.parse_args().print_all
     print_tokens = parser.parse_args().print_tokens
+    output_arg = parser.parse_args().output
 
     # Read source code
     with open(path, 'r') as sourceFile:
@@ -45,6 +52,22 @@ def main():
     # Parse tokens using lexer
     lexical_analyzer = Lexer(sourceCode)
     tokens = lexical_analyzer.tokenize()
+
+    # Save tokens to txt file
+    if output_arg:
+        output_path = output_arg
+    else:
+        output_file = f"{path.stem}{tokenOutputExt}"
+        output_path = f"{path.cwd()}/{output_file}"
+
+    # Clear output file if already exists and write headers
+    with open(output_path, 'w') as tokens_txt:
+        tokens_txt.write(f"{'Token':15}Lexeme\n\n")
+
+    # Append each token to output file
+    with open(output_path, 'a') as tokens_txt:
+        for token in tokens:
+            tokens_txt.write(f"{token.type:15}{token.value}\n")
 
     # Print unmodified source code
     if print_all:
