@@ -5,6 +5,7 @@
 * [2. Language Specification](#2-language-specification)
   * [2.1 Comments](#21-comments)
   * [2.2 Identifiers](#22-identifiers)
+  * [2.3 Keywords](#23-keywords)
   * [2.4 Integers](#24-integers)
   * [2.5 Reals](#25-reals)
   * [2.6 Operators](#26-operators)
@@ -44,7 +45,7 @@ rows will be ignored by the compiler. *]
 
 An identifier is a sequence of letters (a - z), digits (0 - 9), and underscores ("_"). The first character in an identifier must be a letter. Case is insignificant, so the lexical analyzer must convert all uppercase letters to lowercase so that all tokens are lowercase.
 
-### 2.2 Keywords
+### 2.3 Keywords
 
 The following identifiers are keywords of the language and cannot be used for ordinary identifiers.
 
