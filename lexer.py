@@ -81,7 +81,7 @@ class Lexer:
             elif token_checker_fsm.is_identifier(token): # Identifier
                 self.tokens.append(Token('identifier', token))
 
-            elif re.match('^\d+$', token): # Integer
+            elif token_checker_fsm.is_integer(token): # Integer
                 self.tokens.append(Token('integer', token))
 
             elif token_checker_fsm.is_real(token): # Real
