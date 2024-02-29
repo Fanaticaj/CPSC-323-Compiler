@@ -57,3 +57,33 @@ class FSM:
         # Run FSM on string w and return result
         is_accepted = self.run_fsm(real_tt, real_alpha, real_accepted, w)
         return is_accepted
+    
+    def is_identifier(self, w):
+        """Return True if the string w is an identifier, False otherwise"""
+        # Transition table for identifier. RE: l(l|d|_)*
+        identifier_tt = [
+            [1, 11, 11],
+            [2, 2, 2],
+            [2, 2, 2],
+            [6, 11, 11],
+            [11, 7, 11],
+            [11, 11, 8],
+            [9, 9, 9],
+            [9, 9, 9],
+            [9, 9, 9],
+            [2, 2, 2],
+            [11, 11, 11]
+        ]
+
+        # Alphabet map for real numbers. Maps symbols to column in
+        # transition table
+        # digits are all col 0; '.' is col 1
+        identifier_alpha = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0,
+                      '7': 0, '8': 0, '9': 0, '.': 1}
+        
+        # Accepted states for real numbers
+        identifier_accepted = set([10])
+
+        # Run FSM on string w and return result
+        is_accepted = self.run_fsm(identifier_tt, identifier_alpha, identifier_accepted, w)
+        return is_accepted

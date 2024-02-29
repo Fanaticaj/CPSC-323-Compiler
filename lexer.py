@@ -73,15 +73,20 @@ class Lexer:
 
         token_checker_fsm = FSM()
 
+        # Iterate through each token checking if a match is found
         for token in potentialTokens:
             if token in self.symbols:
                 self.tokens.append(Token(self.symbols[token], token))
-            elif re.match('^[A-Za-z][A-Za-z0-9_]*$', token):
+
+            elif token_checker_fsm.is_identifier(token): # Identifier
                 self.tokens.append(Token('identifier', token))
-            elif re.match('^\d+$', token):
+
+            elif re.match('^\d+$', token): # Integer
                 self.tokens.append(Token('integer', token))
-            elif token_checker_fsm.is_real(token):
+
+            elif token_checker_fsm.is_real(token): # Real
                 self.tokens.append(Token('real', token))
+                
             else:
                 self.tokens.append(Token('invalid', token))
 
