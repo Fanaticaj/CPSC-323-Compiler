@@ -4,8 +4,9 @@ from pathlib import Path
 
 from lexer import Lexer
 
+# If user does not input source file, defaultSourceFile will be used instead
 defaultSourceFile = './RAT24S_programs/RAT24S.source'
-tokenOutputExt = '_tokens.txt'
+tokenOutputExt = '_tokens.txt' # Append tokenOutputExt to token files when saving tokens
 
 def print_source_code(sourceCode):
     """Print the source code used by the compiler"""
@@ -21,29 +22,28 @@ def print_formatted_tokens(tokens, l):
     print('='*80)
 
 def main():
-    parser = argparse.ArgumentParser()
+    arg_parser = argparse.ArgumentParser()
 
     # Path to source code file arg
-    parser.add_argument('source_code', metavar='SourceCodeFilePath', type=str,
+    arg_parser.add_argument('source_code', metavar='SourceCodeFilePath', type=str,
                     nargs='?', default=defaultSourceFile,
                     help="Path to the source code file that will be compiled")
 
     # Arg to print source code and tokens
-    parser.add_argument('-p', '--print-all', action='store_true',
+    arg_parser.add_argument('-p', '--print-all', action='store_true',
                     default=False, help="print source code and tokens")
     # Arg to print tokens only
-    parser.add_argument('-t', '--print-tokens', action='store_true',
+    arg_parser.add_argument('-t', '--print-tokens', action='store_true',
                     default=False, help="print tokens returned by lexer")
-
     # Arg to specify output file (optional)
-    parser.add_argument('-o', '--output', action='store', default=None,
+    arg_parser.add_argument('-o', '--output', action='store', default=None,
                     help="Specify output file")
 
-    # Parse arguments
-    path = Path(parser.parse_args().source_code)
-    print_all = parser.parse_args().print_all
-    print_tokens = parser.parse_args().print_tokens
-    output_arg = parser.parse_args().output
+    # Parse command-line arguments
+    path = Path(arg_parser.parse_args().source_code)
+    print_all = arg_parser.parse_args().print_all
+    print_tokens = arg_parser.parse_args().print_tokens
+    output_arg = arg_parser.parse_args().output
 
     # Read source code
     with open(path, 'r') as sourceFile:

@@ -1,8 +1,5 @@
 import string
 
-from dataclasses import dataclass, field
-
-@dataclass
 class FSM:
     """
     This FSM class uses transition tables to run finite-state machines to check
@@ -88,13 +85,20 @@ class FSM:
         return is_accepted
 
     def is_integer(self, w):
+        """Return True if string w is an integer, False otherwise"""
+        # Transition table for an integer. RE: d+
         integer_tt = [
             [1],
             [1]
-            ]
-        
+        ]
+
+        # Alphabet mapping digit symbols to their column in the transition table
         integer_alpha ={'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0,
                       '7': 0, '8': 0, '9': 0}
+
+        # Set of accepted states in transition table
         integer_accepted = set([1])
+
+        # Run finite-state machine to check if string w is an integer
         is_accepted = self.run_fsm(integer_tt, integer_alpha, integer_accepted, w)
         return is_accepted

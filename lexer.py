@@ -4,6 +4,13 @@ from fsm import FSM
 from parse_token import Token
 
 class Lexer:
+    """
+    This Lexer class is the lexer for the compiler.
+    It takes source code as input and outputs a list of Tokens.
+    There are 7 kinds of tokens:
+    keywords, separators, operators, identifiers, integers, reals, and illegals
+    """
+
     symbols = {
         #---------- Keywords ----------#
         'function'  : 'keyword',
@@ -86,6 +93,7 @@ class Lexer:
 
             elif token_checker_fsm.is_real(token): # Real
                 self.tokens.append(Token('real', token))
+
             else:
                 self.tokens.append(Token('illegal', token))
 
