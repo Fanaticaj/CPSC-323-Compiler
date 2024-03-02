@@ -86,9 +86,8 @@ class Lexer:
 
             elif token_checker_fsm.is_real(token): # Real
                 self.tokens.append(Token('real', token))
-                
             else:
-                self.tokens.append(Token('invalid', token))
+                self.tokens.append(Token('illegal', token))
 
         return self.tokens
 

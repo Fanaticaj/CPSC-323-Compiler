@@ -8,7 +8,7 @@ class Token:
 
     def __post_init__(self):
         # Check that token type is valid
-        valid_types = set(['identifier', 'integer', 'invalid', 'keyword', 'operator', 'real', 'separator'])
+        valid_types = set(['identifier', 'illegal', 'integer', 'keyword', 'operator', 'real', 'separator'])
         if self.type not in valid_types:
             raise ValueError(f"Token type {self.type} is not a valid type.")
 
