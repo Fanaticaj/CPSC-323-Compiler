@@ -55,6 +55,7 @@ class Lexer:
     def __init__(self, sourceCode):
         self.sourceCode = sourceCode
         self.tokens = []
+        self.curr_token = 0  # Used to iterate through tokens by get_next_token method
 
     def tokenize(self):
         """
@@ -122,3 +123,17 @@ class Lexer:
                 print(formatted_str, end=" ")
                 current_token += 1
             print()
+
+    def get_next_token(self):
+        """
+        Return the token at curr_token position and increment curr_token.
+        Return None once all tokens have been returned.
+        This method is needed for syntax analyzer since it must iterate through tokens one by one.
+        """
+        if self.curr_token >= len(self.tokens):
+            return None
+
+        next_token = self.tokens[self.curr_token]
+        self.curr_token += 1
+
+        return next_token
