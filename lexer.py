@@ -69,6 +69,8 @@ class Lexer:
 	list: A list of tokens identified in the source code.
         """
 
+        self.tokens = []  # Clear tokens list incase tokenize method is run more than once
+
 	# Remove comments from source code
         re_comments = r'\[\*[\s\S]*?\*\]'
         self.sourceCode = re.sub(re_comments, '', self.sourceCode)
