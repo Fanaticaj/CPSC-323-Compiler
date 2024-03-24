@@ -86,7 +86,7 @@ class Lexer:
         # Iterate through each token checking if a match is found
         for token in potentialTokens:
             # Remove any whitespace that might exist in token (Should just be
-            # two char opeerators that could have space between them)
+            # two char operators that could have space between them)
             token = token.replace(" ", "")
             
             if token in self.symbols:

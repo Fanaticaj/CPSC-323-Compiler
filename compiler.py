@@ -46,7 +46,7 @@ def main():
     output_arg = arg_parser.parse_args().output
 
     # Read source code
-    with open(path, 'r') as sourceFile:
+    with open(path, mode='r', encoding='utf-8-sig') as sourceFile:
         sourceCode = sourceFile.read()
 
     # Parse tokens using lexer
