@@ -84,7 +84,7 @@ The following tokens are operators.
 ```txt
 +	-	*	/
 ==	!=	>	<
-<=	>=	=
+<=	=>	=
 ```
 
 ### 2.7 Separators
