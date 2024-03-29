@@ -48,7 +48,7 @@ class Lexer:
         '<'         : 'operator',
         '>'         : 'operator',
         '<='        : 'operator',
-        '>='        : 'operator',
+        '=>'        : 'operator',
         #---------- Operator ----------#
     }
 
@@ -76,7 +76,7 @@ class Lexer:
         self.sourceCode = re.sub(re_comments, '', self.sourceCode)
 
         # Split source code into tokens
-        re_operators = r'= ?=|! ?=|< ?=|> ?=|\+|\-|\*|\/|<|>|='
+        re_operators = r'==|!=|<=|=>|\+|\-|\*|\/|<|>|='
         re_separators = r'\(|\)|\{|\}|\,|\;|\$|\s'
         re_split_pattern = f'({re_operators})|({re_separators})'
         potentialTokens = [token for token in re.split(re_split_pattern, self.sourceCode) if token and not token.isspace()]
@@ -85,10 +85,6 @@ class Lexer:
 
         # Iterate through each token checking if a match is found
         for token in potentialTokens:
-            # Remove any whitespace that might exist in token (Should just be
-            # two char operators that could have space between them)
-            token = token.replace(" ", "")
-            
             if token in self.symbols:
                 self.tokens.append(Token(self.symbols[token], token))
 
@@ -115,7 +111,7 @@ class Lexer:
         lines = self.sourceCode.split('\n')
         token_count_per_line = []
         for line in lines:
-            re_operators = r'==|!=|<=|>=|\+|\-|\*|\/|<|>|='
+            re_operators = r'==|!=|<=|=>|\+|\-|\*|\/|<|>|='
             re_separators = r'\(|\)|\{|\}|\,|\;|\$|\s'
             re_split_pattern = f'({re_operators})|({re_separators})'
             potentialTokens = [token for token in re.split(re_split_pattern, line) if token and not token.isspace()]

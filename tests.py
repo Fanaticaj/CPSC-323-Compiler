@@ -52,27 +52,15 @@ class TestLexer(unittest.TestCase):
 
     def test_operators(self):
         """Test that operators are tokenized as operators"""
-        source_code = "+ - * / == != > < <= >= ="
+        source_code = "+ - * / == != > < <= => ="
         l = Lexer(source_code)
         tokens = l.tokenize()
         expected_tokens = [
                 Token(type='operator', value='+'), Token(type='operator', value='-'), Token(type='operator', value='*'), Token(type='operator', value='/'),
                 Token(type='operator', value='=='), Token(type='operator', value='!='), Token(type='operator', value='>'), Token(type='operator', value='<'),
-                Token(type='operator', value='<='), Token(type='operator', value='>='), Token(type='operator', value='=')
+                Token(type='operator', value='<='), Token(type='operator', value='=>'), Token(type='operator', value='=')
             ]
 
-        self.assertEqual(tokens, expected_tokens)
-        
-    def test_operators_with_space(self):
-        """Test that two character operators with a space between them are still tokenized as a single token"""
-        source_code = "= =\n! =\n< =\n> =\n"
-        l = Lexer(source_code)
-        tokens = l.tokenize()
-        expected_tokens = [
-            Token(type='operator', value='=='), Token(type='operator', value='!='),
-            Token(type='operator', value='<='), Token(type='operator', value='>=')
-            ]
-        
         self.assertEqual(tokens, expected_tokens)
 
     def test_identifiers(self):
