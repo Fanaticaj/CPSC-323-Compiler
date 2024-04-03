@@ -56,6 +56,8 @@ class Lexer:
         self.sourceCode = sourceCode
         self.tokens = []
         self.curr_token = 0  # Used to iterate through tokens by get_next_token method
+        # Tokenize on initialization
+        self.tokenize()
 
     def tokenize(self):
         """

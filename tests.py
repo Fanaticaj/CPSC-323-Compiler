@@ -2,6 +2,7 @@ import unittest
 
 from lexer import Lexer
 from parse_token import Token
+from rdp import RDP
 
 class TestLexer(unittest.TestCase):
     """Test that lexer works"""
@@ -92,6 +93,41 @@ class TestLexer(unittest.TestCase):
             ]
 
         self.assertEqual(tokens, expected_tokens)
+        
+class TestRDP(unittest.TestCase):
+    """Test recursive descent parser"""
+    
+    def test_scan(self):
+        """
+        R21. <Scan> ::= scan ( <IDs> );
+        """
+        source = "scan (var123);"
+        l = Lexer(source)
+        parser = RDP(l)
+        is_scan = parser.scan()
+        self.assertTrue(is_scan)
+        
+    def test_while(self):
+        """
+        R22. <While> ::= while ( <Condition> ) <Statement> endwhile
+        """
+        source = "while (3 < 1) return; endwhile"
+        l = Lexer(source)
+        parser = RDP(l)
+        is_while = parser.While()
+        self.assertTrue(is_while)
+    
+    def test_relop(self):
+        """
+        R24. <Relop> ::= == | != | > | < | <= | =>
+        """
+        operators = ['==', '!=', '>', '<', '<=', '=>']
+        for op in operators:
+            source = op
+            l = Lexer(source)
+            parser = RDP(l)
+            is_relop = parser.relop()
+            self.assertTrue(is_relop)
 
 if __name__ == "__main__":
     unittest.main()

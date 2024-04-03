@@ -4,10 +4,15 @@ class RDP:
   def __init__(self, lexer):
     self.lexer = lexer
     
-  def token_is(self, token_type):
-    """Return True if next token type from next token in lexer is equal to token_type"""
+  def token_is(self, token_type, token_val=None):
+    """
+    Return True if next token type of next token in lexer is equal to token_type.
+    Enter value for token_val if value of token matters ie. operators, separators, and keywords
+    """
     next_token = self.lexer.get_next_token()
-    if next_token.type == token_type:
+    if next_token.type == token_type and token_val == None:
+      return True
+    elif next_token.type == token_type and token_val == next_token.value:
       return True
     
     # Backtrack if token type not equal to token_type
@@ -138,14 +143,45 @@ class RDP:
     """
     R21. <Scan> ::= scan ( <IDs> );
     """
-    raise NotImplementedError
-  
+    if self.token_is('keyword', 'scan'):
+      if self.token_is('separator', '('):
+        if self.IDs():
+          if self.token_is('separator', ')'):
+            if self.token_is('separator', ';'):
+              return True
+            else:
+              return False
+        else:
+          return False
+      else:
+        return False
+    else:
+      return False
+      
   def While(self):
     """
     R22. <While> ::= while ( <Condition> ) <Statement> endwhile
     """
-    raise NotImplementedError
-  
+    if self.token_is('keyword', 'while'):
+      if self.token_is('separator', '('):
+        if self.condition():
+          if self.token_is('separator', ')'):
+            if self.statement():
+              if self.token_is('keyword', 'endwhile'):
+                return True
+              else:
+                return False
+            else:
+              return False
+          else:
+            return False
+        else:
+          return False
+      else:
+        return False
+    else:
+      return False
+      
   def condition(self):
     """
     R23. <Condition> ::= <Expression> <Relop> <Expression>
@@ -156,7 +192,13 @@ class RDP:
     """
     R24. <Relop> ::= == | != | > | < | <= | =>
     """
-    raise NotImplementedError
+    operators = set(['==', '!=', '>', '<', '<=', '=>'])
+    next_token = self.lexer.get_next_token()
+    if next_token.type == 'operator' and next_token.value in operators:
+      return True
+    else:
+      self.lexer.backtrack()
+      return False
   
   def expression(self):
     """
