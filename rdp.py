@@ -118,6 +118,12 @@ class RDP:
     return False
     raise NotImplementedError
   
+  def qualifier(self):
+    """
+    R8. <Qualifier> ::= integer | boolean | real
+    """
+    raise NotImplementedError
+  
   def body(self):
     """
     R8. <Body> ::= { <Statement List> }

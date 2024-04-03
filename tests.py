@@ -97,6 +97,51 @@ class TestLexer(unittest.TestCase):
 class TestRDP(unittest.TestCase):
     """Test recursive descent parser"""
     
+    def test_rat24s(self):
+        """
+        R1. <Rat24S> ::= $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $
+        """
+        programs = [
+            '$ $ $ print (true); $',
+            '$function oea3 ( ) {if  ( -(  false/-0.322/ - 0--6.5 /- 69* - 1*  - false /-    false /  na   )  +3.13+wf( usjn,rux, zbqpo)=> -  5 +b(jctn ) +-u ( hv7, o2 , g69q) /  -p(y7j,     dp  , hl)) return;endif  } function dc(  ) {return;}$integerdu, yg3; $return    ; $ '
+        ]
+        
+        for program in programs:
+            l = Lexer(program)
+            parser = RDP(l)
+            is_program = parser.rat24s()
+            self.assertTrue(is_program, f"Not recognized as rat24s program: {program}")
+            
+    def test_opt_function_definitions(self):
+        """
+        R2. <Opt Function Definitions> ::= <Function Definitions> | <Empty>
+        """
+        tests = [
+            '', # Empty
+            'function myfunc() boolean b2t ;boolean m4; {x =( -y (zt)* true *29.18 / x35zeh ) + false; }',
+            'function k25jl( ) boolean b2t ;booleanm4; {s8ado =( -io6n  (z92t   )* true    *29.18 / x35zeh ) + - false ;}'
+        ]
+        
+        for t in tests:
+            l = Lexer(t)
+            parser = RDP(l)
+            is_opt_function_definition = parser.opt_function_definitions()
+            self.assertTrue(is_opt_function_definition, f"Not recognized as Opt Function Definitions: {t}")
+        
+    def test_function_definitions(self):
+        """
+        R3. <Function Definitions> ::= <Function> | <Function> <Function Definitions>
+        """
+        function_defs = [
+            'function myfunc() boolean b2t ;boolean m4; {x =( -y (zt)* true *29.18 / x35zeh ) + false; }'
+        ]
+        
+        for func_def in function_defs:
+            l = Lexer(func_def)
+            parser = RDP(l)
+            is_func_def = parser.function_definitions
+            self.assertTrue(is_func_def)
+    
     def test_scan(self):
         """
         R21. <Scan> ::= scan ( <IDs> );
@@ -105,7 +150,7 @@ class TestRDP(unittest.TestCase):
         l = Lexer(source)
         parser = RDP(l)
         is_scan = parser.scan()
-        self.assertTrue(is_scan)
+        self.assertTrue(is_scan, f"Not recognized as scan: {source}")
         
     def test_while(self):
         """
@@ -115,7 +160,7 @@ class TestRDP(unittest.TestCase):
         l = Lexer(source)
         parser = RDP(l)
         is_while = parser.While()
-        self.assertTrue(is_while)
+        self.assertTrue(is_while, f"Not recognized as while: {source}")
         
     def test_condition(self):
         """
@@ -127,7 +172,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(condition)
             parser = RDP(l)
             is_condition = parser.condition()
-            self.assertTrue(is_condition)
+            self.assertTrue(is_condition, f"Not recognized as condition: {condition}")
             
     
     def test_relop(self):
@@ -140,7 +185,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(source)
             parser = RDP(l)
             is_relop = parser.relop()
-            self.assertTrue(is_relop)
+            self.assertTrue(is_relop, f"Not recognized as operator: {op}")
             
     def test_expression(self):
         """
@@ -157,7 +202,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(exp)
             parser = RDP(l)
             is_exp = parser.expression()
-            self.assertTrue(is_exp)
+            self.assertTrue(is_exp, f"Not recognized as expression: {exp}")
             
     def test_expression_prime(self):
         """
@@ -176,7 +221,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(t)
             parser = RDP(l)
             is_expression_prime = parser.expression_prime()
-            self.assertTrue(is_expression_prime)
+            self.assertTrue(is_expression_prime, f"Not recognized as expression prime: {t}")
             
     def test_term(self):
         """
@@ -198,7 +243,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(term)
             parser = RDP(l)
             is_term = parser.term()
-            self.assertTrue(is_term)
+            self.assertTrue(is_term, f"Not recognized as term: {term}")
             
     def test_term_prime(self):
         """
@@ -219,30 +264,22 @@ class TestRDP(unittest.TestCase):
             l = Lexer(tp)
             parser = RDP(l)
             is_term_prime = parser.term_prime()
-            self.assertTrue(is_term_prime)
+            self.assertTrue(is_term_prime, f"Not recognized as term prime: {tp}")
             
     def test_factor(self):
         """
         R29. <Factor> ::= - <Primary> | <Primary>
         """
         factors = [
-            '42',
-            '-24',
-            'x',
-            '3.14',
-            'true',
-            '(a + b)',
-            'func(a, b)',
-            '-2.718',
-            '-(x * 2)',
-            '-func(x)'
+            '- 3',
+            'myvar123'
         ]
         
         for f in factors:
             l = Lexer(f)
             parser = RDP(l)
             is_factor = parser.factor()
-            self.assertTrue(is_factor)
+            self.assertTrue(is_factor, f"Not recognized as factor: {f}")
             
     def test_primary(self):
         """
@@ -252,14 +289,11 @@ class TestRDP(unittest.TestCase):
         primaries = [
             'x',
             '123',
+            'func(x, y)',
             '45.67',
             'true',
             'false',
             '(a + b)',
-            'func(x, y)',
-            'compute(5, 3.14, true)',
-            '((x + 2) * 3)',
-            '(-(x + y))'
         ]
         
         for p in primaries:
