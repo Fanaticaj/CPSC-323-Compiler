@@ -11,6 +11,8 @@ class RDP:
     Enter value for token_val if value of token matters ie. operators, separators, and keywords
     """
     next_token = self.lexer.get_next_token()
+    if next_token is None:
+      return False
     if next_token.type == token_type and token_val == None:
       return True
     elif next_token.type == token_type and token_val == next_token.value:
@@ -261,7 +263,16 @@ class RDP:
     """
     R23. <Condition> ::= <Expression> <Relop> <Expression>
     """
-    raise NotImplementedError
+    if self.expression():
+      if self.relop():
+        if self.expression():
+          return True
+        else:
+          return False
+      else:
+        return False
+    else:
+      return False
   
   def relop(self):
     """
@@ -279,40 +290,122 @@ class RDP:
     """
     R25. <Expression> ::= <Term> <Expression_prime>
     """
-    raise NotImplementedError
+    if self.term():
+      if self.expression_prime():
+        return True
+      else:
+        return False
+    else:
+      return False
   
   def expression_prime(self):
     """
     R26. <Expression_prime> ::= + <Term> <Expression_prime> | - <Term> <Expression_prime> | <Empty>
     """
-    raise NotImplementedError
+    if self.token_is('operator', '+'):
+      if self.term():
+        if self.expression_prime():
+          return True
+        else:
+          return False
+      else:
+        return False
+    elif self.token_is('operator', '-'):
+      if self.term():
+        if self.expression_prime():
+          return True
+        else:
+          return False
+      else:
+        return False
+    elif self.empty():
+      return True
+    else:
+      return False
   
   def term(self):
     """
     R27. <Term> ::= <Factor> <Term_prime>
     """
-    raise NotImplementedError
+    if self.factor():
+      if self.term_prime():
+        return True
+    return False
   
   def term_prime(self):
     """
     R28. <Term_prime> ::= * <Factor> <Term_prime> | / <Factor> <Term_prime> | <Empty>
     """
-    raise NotImplementedError
+    if self.token_is('operator', '*'):
+      if self.factor():
+        if self.term_prime():
+          return True
+        else:
+          return False
+      else:
+        return False
+    elif self.token_is('operator', '/'):
+      if self.factor():
+        if self.term_prime():
+          return True
+        else:
+          return False
+      else:
+        return False
+    elif self.empty():
+      return True
+    
+    return False
   
   def factor(self):
     """
     R29. <Factor> ::= - <Primary> | <Primary>
     """
-    raise NotImplementedError
+    if self.token_is('operator', '-'):
+      if self.primary():
+        return True
+    elif self.primary():
+      return True
+    
+    return False
   
   def primary(self):
     """
-    R30. <Primary> ::= <Identifier> | <Integer> | <Identifier> ( <IDs> ) | ( <Expression> ) | <Real> | true | false
+    R30. <Primary> ::= <Identifier> | <Integer> | <Identifier> ( <IDs> ) |
+    ( <Expression> ) | <Real> | true | false
     """
-    raise NotImplementedError
+    if self.token_is('identifier'):
+      if self.token_is('separator', '('):
+        if self.IDs():
+          if self.token_is('separator', ')'):
+            return True
+          else:
+            return False
+        else:
+          return False
+      else:      
+        return True
+    elif self.token_is('integer'):
+      return True
+    elif self.token_is('separator', '('):
+      if self.expression():
+        if self.token_is('separator', ')'):
+          return True
+        else:
+          return False
+      else:
+        return False
+    elif self.token_is('real'):
+      return True
+    elif self.token_is('keyword', 'true'):
+      return True
+    elif self.token_is('keyword', 'false'):
+      return True
+    
+    return False
   
   def empty(self):
     """
     R31. <Empty> ::= None
     """
-    raise NotImplementedError
+    return True

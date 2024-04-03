@@ -116,6 +116,19 @@ class TestRDP(unittest.TestCase):
         parser = RDP(l)
         is_while = parser.While()
         self.assertTrue(is_while)
+        
+    def test_condition(self):
+        """
+        R23. <Condition> ::= <Expression> <Relop> <Expression>
+        """
+        operators = ['==', '!=', '>', '<', '<=', '=>']
+        for op in operators:
+            condition = f"3 {op} 1"
+            l = Lexer(condition)
+            parser = RDP(l)
+            is_condition = parser.condition()
+            self.assertTrue(is_condition)
+            
     
     def test_relop(self):
         """
@@ -128,6 +141,132 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_relop = parser.relop()
             self.assertTrue(is_relop)
+            
+    def test_expression(self):
+        """
+        R25. <Expression> ::= <Term> <Expression_prime>
+        """
+        expressions = [
+            "1",
+            "1 + 2",
+            "1 * 3",
+            "4 / 2 + 3",
+            "3 + a * -2 - 4 / b"
+        ]
+        for exp in expressions:
+            l = Lexer(exp)
+            parser = RDP(l)
+            is_exp = parser.expression()
+            self.assertTrue(is_exp)
+            
+    def test_expression_prime(self):
+        """
+        R26. <Expression_prime> ::= + <Term> <Expression_prime> | - <Term> <Expression_prime> | <Empty>
+        """
+        tests = [
+            '+ 5',
+            '- a',
+            '+ 3 - b * 2 + (c + d)',
+            '+ 2.5 - true',
+            '', # Empty
+            '+ func(x, y) - 10',
+            '+ (x - y)'
+        ]
+        for t in tests:
+            l = Lexer(t)
+            parser = RDP(l)
+            is_expression_prime = parser.expression_prime()
+            self.assertTrue(is_expression_prime)
+            
+    def test_term(self):
+        """
+        R27. <Term> ::= <Factor> <Term_prime>
+        """
+        terms = [
+            '3',
+            'x',
+            '-a',
+            '4 * x',
+            'y / 2',
+            '(3 + a) * 5',
+            'b * -2 / (c + 1)',
+            '2.5 * func(x)',
+            'true / false'
+        ]
+        
+        for term in terms:
+            l = Lexer(term)
+            parser = RDP(l)
+            is_term = parser.term()
+            self.assertTrue(is_term)
+            
+    def test_term_prime(self):
+        """
+        R28. <Term_prime> ::= * <Factor> <Term_prime> | / <Factor> <Term_prime> | <Empty>
+        """
+        term_primes = [
+            '* 5',
+            '/ a',
+            '* x / 2',
+            '* -3 / b * (c + 1)',
+            '/ 2.5',
+            '* func(x, y)',
+            '',
+            '* (x - y) / true'
+        ]
+        
+        for tp in term_primes:
+            l = Lexer(tp)
+            parser = RDP(l)
+            is_term_prime = parser.term_prime()
+            self.assertTrue(is_term_prime)
+            
+    def test_factor(self):
+        """
+        R29. <Factor> ::= - <Primary> | <Primary>
+        """
+        factors = [
+            '42',
+            '-24',
+            'x',
+            '3.14',
+            'true',
+            '(a + b)',
+            'func(a, b)',
+            '-2.718',
+            '-(x * 2)',
+            '-func(x)'
+        ]
+        
+        for f in factors:
+            l = Lexer(f)
+            parser = RDP(l)
+            is_factor = parser.factor()
+            self.assertTrue(is_factor)
+            
+    def test_primary(self):
+        """
+        R30. <Primary> ::= <Identifier> | <Integer> | <Identifier> ( <IDs> ) |
+        ( <Expression> ) | <Real> | true | false        
+        """
+        primaries = [
+            'x',
+            '123',
+            '45.67',
+            'true',
+            'false',
+            '(a + b)',
+            'func(x, y)',
+            'compute(5, 3.14, true)',
+            '((x + 2) * 3)',
+            '(-(x + y))'
+        ]
+        
+        for p in primaries:
+            l = Lexer(p)
+            parser = RDP(l)
+            is_primary = parser.primary()
+            self.assertTrue(is_primary, f"Not recognized as primary: {p}")
 
 if __name__ == "__main__":
     unittest.main()
