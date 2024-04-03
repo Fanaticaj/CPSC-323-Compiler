@@ -1,4 +1,5 @@
 """Recursive Descent Parser for Syntax Analysis"""
+from lexer import Lexer
 
 class RDP:
   def __init__(self, lexer):
@@ -23,12 +24,29 @@ class RDP:
     """
     R1. <Rat24S> ::= $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $
     """
+    print("Token: Symbol          Lexeme: $")
+    print("<Rat24S> ::= $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $")
+    if self.token_is('symbol', '$'):
+      self.opt_function_definitions()
+      if self.token_is('symbol', '$'):
+        self.opt_declaration_list()
+        if self.token_is('symbol', '$'):
+          self.statement_list()
+          if self.token_is('symbol', '$'):
+            print("Parsing <Rat24S> successful.")
+            return True
+    print("Parsing <Rat24S> failed.")
     raise NotImplementedError
   
   def opt_function_definitions(self):
     """
     R2. <Opt Function Definitions> ::= <Function Definitions> | <Empty>
     """
+    print("<Opt Function Definitions> ::= <Function Definitions> | <Empty>")
+    if not self.function_definitions():  # Attempt parsing <Function Definitions>
+      self.empty()  # If it fails, treat as empty
+      return True
+
     raise NotImplementedError
   
   def function_definitions(self):
@@ -39,32 +57,83 @@ class RDP:
 
   def function(self):
     """
-    R4. <Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>
+    R4. <Function> ::= function <Identifier> ( <Opt ParaI ggmeter List> ) <Opt Declaration List> <Body>
     """
+    print("<Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>")
+    if self.token_is('keyword', 'function'):
+      if self.IDs():
+        if self.token_is('separator', '('):
+          self.opt_parameter_list()
+          if self.token_is('separator', ')'):
+            self.opt_declaration_list()
+            self.body()
+            return True
     raise NotImplementedError
   
   def opt_parameter_list(self):
     """
     R5. <Opt Parameter List> ::= <Parameter List> | <Empty>
     """
+    print("<Opt Parameter List> ::= <Parameter List> | <Empty>")
+    # Attempt to parse a parameter list. If successful, the parameter_list function will handle its own logging.
+    if not self.parameter_list():  # If no parameter list found, treat as empty.
+        self.empty()
+        return True
+  
     raise NotImplementedError
   
   def parameter_list(self):
     """
     R6. <Parameter List> ::= <Parameter> | <Parameter> , <Parameter List>
     """
+    print("<Parameter List> ::= <Parameter> | <Parameter>, <Parameter List>")
+    if self.parameter():
+        # While loop for handling comma-separated parameter list.
+        while True:
+            current_token = self.lexer.get_next_token()
+            if current_token.type == 'separator' and current_token.value == ',':
+                self.lexer.get_next_token()
+                print("Token: Separator          Lexeme: ,")
+                if not self.parameter():
+                    print("Error: Expected a parameter after ','.")
+                    return False
+            else:
+                break
+    else:
+        print("Error: Expected a parameter.")
+        return False
+    return True
+  
     raise NotImplementedError
   
   def parameter(self):
     """
     R7. <Parameter> ::= <IDs> <Qualifier>
     """
+    print("<Parameter> ::= <IDs> <Qualifier>")
+    if self.IDs() and self.qualifier():
+        return True
+    return False
     raise NotImplementedError
   
   def body(self):
     """
     R8. <Body> ::= { <Statement List> }
     """
+    print("<Body> ::= { <Statement List> }")
+    if self.token_is('separator', '{'):
+        print("Token: Separator          Lexeme: {")
+        if self.statement_list():  # Process the statement list.
+            if self.token_is('separator', '}'):
+                print("Token: Separator          Lexeme: }")
+                return True
+            else:
+                print("Error: Expected '}' at the end of the body.")
+        else:
+            print("Error: Invalid statement list inside body.")
+    else:
+        print("Error: Expected '{' at the beginning of the body.")
+    return False
     raise NotImplementedError
   
   def opt_declaration_list(self):
@@ -89,6 +158,12 @@ class RDP:
     """
     R12. <IDs> ::= <Identifier> | <Identifier>, <IDs>
     """
+    next_token = self.lexer.get_next_token()
+    if next_token.type == 'identifier':
+      print(f"Token: Identifier          Lexeme: {next_token.value}")
+      return True
+    self.lexer.backtrack()
+
     raise NotImplementedError
   
   def statement_list(self):
