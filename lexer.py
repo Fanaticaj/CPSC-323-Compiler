@@ -139,3 +139,10 @@ class Lexer:
         self.curr_token += 1
 
         return next_token
+    
+    def backtrack(self):
+        """Backtrack one position"""
+        if self.curr_token == 0:
+            return
+        
+        self.curr_token -= 1

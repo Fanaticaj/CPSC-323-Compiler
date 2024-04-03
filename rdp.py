@@ -10,6 +10,10 @@ class RDP:
     if next_token.type == token_type:
       return True
     
+    # Backtrack if token type not equal to token_type
+    self.lexer.backtrack()
+    return False
+    
   def rat24s(self):
     """
     R1. <Rat24S> ::= $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $
