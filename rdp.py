@@ -59,7 +59,7 @@ class RDP:
 
   def function(self):
     """
-    R4. <Function> ::= function <Identifier> ( <Opt ParaI ggmeter List> ) <Opt Declaration List> <Body>
+    R4. <Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>
     """
     print("<Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>")
     if self.token_is('keyword', 'function'):
@@ -122,7 +122,15 @@ class RDP:
     """
     R8. <Qualifier> ::= integer | boolean | real
     """
-    raise NotImplementedError
+    if self.token_is('keyword', 'integer'):
+      return True
+    elif self.token_is('keyword', 'boolean'):
+      return True
+    elif self.token_is('keyword', 'real'):
+      return True
+    
+    return False
+      
   
   def body(self):
     """
@@ -167,6 +175,8 @@ class RDP:
     R12. <IDs> ::= <Identifier> | <Identifier>, <IDs>
     """
     next_token = self.lexer.get_next_token()
+    if next_token is None:
+      return False
     if next_token.type == 'identifier':
       print(f"Token: Identifier          Lexeme: {next_token.value}") #
       return True

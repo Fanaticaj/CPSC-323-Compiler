@@ -148,3 +148,19 @@ class Lexer:
             return
         
         self.curr_token -= 1
+        
+    def get_prev_token(self):
+        """
+        Return the previous token.
+        Used when you need token value of token that you just checked in RDP
+        Ex:
+        if token_is('identifier', 'myvar'):
+            token = lexer.get_prev_token()
+            print(token.value)
+        """
+        idx = self.curr_token - 1
+        
+        if self.curr_token == 0:
+            idx = 0
+        
+        return self.tokens[idx]

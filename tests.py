@@ -133,7 +133,8 @@ class TestRDP(unittest.TestCase):
         R3. <Function Definitions> ::= <Function> | <Function> <Function Definitions>
         """
         function_defs = [
-            'function myfunc() boolean b2t ;boolean m4; {x =( -y (zt)* true *29.18 / x35zeh ) + false; }'
+            'function myfunc() boolean b2t ;boolean m4; {x =( -y (zt)* true *29.18 / x35zeh ) + false; }',
+            'function myfunc() boolean b2t ;boolean m4; {x =( -y (zt)* true *29.18 / x35zeh ) + false; } function myfunc() boolean b2t; {x=29;}'
         ]
         
         for func_def in function_defs:
@@ -141,7 +142,251 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_func_def = parser.function_definitions
             self.assertTrue(is_func_def)
-    
+            
+    def test_function(self):
+        """
+        R4. <Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>
+        """
+        funcs = [
+            "function myfunc () {print(myvar * 3 + 1);}",
+            "function myfunc (myid integer) {print(myvar * 3 + 1);}",
+            "function myfunc () real myvar, myvar2 ;  {print(myvar * 3 + 1);}",
+        ]
+        
+        for func in funcs:
+            l = Lexer(func)
+            parser = RDP(l)
+            is_func = parser.function()
+            self.assertTrue(is_func)
+            
+    def test_opt_parameter_list(self):
+        """
+        R5. <Opt Parameter List> ::= <Parameter List> | <Empty>
+        """
+        param_lists = [
+            '', # Empty
+            'istrue boolean',
+        ]
+        
+        for opt_param_list in param_lists:
+            l = Lexer(opt_param_list)
+            parser = RDP(l)
+            is_opt_param_list = parser.opt_parameter_list()
+            self.assertTrue(is_opt_param_list)
+            
+    def test_parameter_list(self):
+        """
+        R6. <Parameter List> ::= <Parameter> | <Parameter> , <Parameter List>
+        """
+        param_lists = [
+            'myint integer',
+            'myint integer , mybool boolean'
+        ]
+        
+        for param_list in param_lists:
+            l = Lexer(param_list)
+            parser = RDP(l)
+            is_param_list = parser.parameter_list()
+            self.assertTrue(is_param_list)
+            
+    def test_parameter(self):
+        """
+         R7. <Parameter> ::= <IDs> <Qualifier>
+        """
+        param = 'myint integer'
+        l = Lexer(param)
+        parser = RDP(l)
+        is_param = parser.parameter()
+        self.assertTrue(is_param)
+        
+    def test_qualifier(self):
+        """
+        R8. <Qualifier> ::= integer | boolean | real
+        """
+        qualifiers = ['integer', 'boolean', 'real']
+        for q in qualifiers:
+            l = Lexer(q)
+            parser = RDP(l)
+            is_qualifier = parser.qualifier()
+            self.assertTrue(is_qualifier)
+            
+    def test_body(self):
+        """
+        R8. <Body> ::= { <Statement List> }
+        """
+        body = '{ print (42); }'
+        l = Lexer(body)
+        parser = RDP(l)
+        is_body = parser.body()
+        self.assertTrue(is_body)
+        
+    def test_opt_declaration_list(self):
+        """
+        R9. <Opt Declaration List> ::= <Declaration List> | <Empty>
+        """
+        opt_dec_lists = [
+            '', # Empty\
+            'integer count;'
+        ]
+        
+        for odl in opt_dec_lists:
+            l = Lexer(odl)
+            parser = RDP(l)
+            is_opt_declartion_list = parser.opt_declaration_list()
+            self.assertTrue(is_opt_declartion_list)
+            
+    def test_declaration_list(self):
+        """
+        R10. <Declaration List> := <Declaration> ; | <Declaration> ; <Declaration List>
+        """
+        dec_lists = [
+            'real myrealvar ;',
+            'boolean myboolvar ; real myrealvar ;'
+        ]
+        
+        for dec_list in dec_lists:
+            l = Lexer(dec_list)
+            parser = RDP(l)
+            is_dec_list = parser.declaration_list()
+            self.assertTrue(is_dec_list)
+            
+    def test_declaration(self):
+        """
+        R11. <Declaration> ::= integer <IDs> | boolean <IDs> | real <IDs>
+        """
+        declarations = [
+            'integer myint',
+            'boolean mybool',
+            'real myreal'
+        ]
+        
+        for dec in declarations:
+            l = Lexer(dec)
+            parser = RDP(l)
+            is_dec = parser.declaration()
+            self.assertTrue(is_dec)
+            
+    def test_IDs(self):
+        """
+        R12. <IDs> ::= <Identifier> | <Identifier>, <IDs>
+        """
+        ids = [
+            'myvar123',
+            'myvar456, myvar123',
+            'myvar456, myvar123, myvar789'
+        ]
+        
+        for id in ids:
+            l = Lexer(id)
+            parser = RDP(l)
+            is_IDs = parser.IDs()
+            self.assertTrue(is_IDs)
+            
+    def test_statement_list(self):
+        """
+        R13. <Statement List> ::= <Statement> | <Statement> <Statement List>
+        """
+        statement_lists = [
+            'print (true);',
+            'if ( 3 < 10 ) islessthan = true; endif print (true);'
+        ]
+        
+        for statement_list in statement_lists:
+            l = Lexer(statement_list)
+            parser = RDP(l)
+            is_statement_list = parser.statement_list()
+            self.assertTrue(is_statement_list)
+            
+    def test_statement(self):
+        """
+        R14. <Statement> ::= <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+        """
+        statements = [
+            '{ scan (myvar); }', # <Compound>
+            'myvar = 1;', # <Assign>
+            'if ( 3 => 4 ) myvar = 1; endif', # <If>
+            'return;', # <Return>
+            'print ( false);', # <Print>
+            'scan (myvar);', # <Scan>
+            'while ( 3 < 1 ) { scan (myvar); } endwhile' # <While>
+        ]
+        
+        for statement in statements:
+            l = Lexer(statement)
+            parser = RDP(l)
+            is_statement = parser.statement()
+            self.assertTrue(is_statement)
+
+    def test_compound(self):
+        """
+        R15. <Compound> ::= { <Statement List> }
+        """
+        compound = '{ print (true); }'
+        l = Lexer(compound)
+        parser = RDP(l)
+        is_compound = parser.compound()
+        self.assertTrue(is_compound)
+        
+    def test_assign(self):
+        """
+        R16. <Assign> ::= <Identifier> = <Expression> ;
+        """
+        assign = "pi = 3.14 ;"
+        l = Lexer(assign)
+        parser = RDP(l)
+        is_assign = parser.assign()
+        self.assertTrue(is_assign)
+        
+    def test_If(self):
+        """
+        R17. <If> ::= if ( <Condition> ) <Statement> <If_prime>
+        """
+        if_statement = 'if ( <Condition> ) <Statement> <If_prime>'
+        l = Lexer(if_statement)
+        parser = RDP(l)
+        is_If = parser.If()
+        self.assertTrue(is_If)
+        
+    def test_If_prime(self):
+        """
+        R18. <If_prime> ::= endif | else <Statement> endif
+        """
+        if_primes = [
+            'endif',
+            'else { scan (myvar); } endif'
+        ]
+        
+        for if_prime in if_primes:
+            l = Lexer(if_prime)
+            parser = RDP(l)
+            is_If_prime = parser.If_prime()
+            self.assertTrue(is_If_prime)
+            
+    def test_Return(self):
+        """
+        R19. <Return> ::= return ; | return <Expression> ;
+        """
+        returns = [
+            'return ;',
+            'return 1 + 2 ;'
+        ]
+        
+        for r in returns:
+            l = Lexer(r)
+            parser = RDP(l)
+            is_return = parser.Return()
+            self.assertTrue(is_return)
+            
+    def test_Print(self):
+        """
+        R20. <Print> ::= print ( <Expression>);
+        """
+        print_statement = "print ( 1 + 2);"
+        l = Lexer(print_statement)
+        parser = RDP(l)
+        is_Print = parser.Print()
+        self.assertTrue(is_Print)
+
     def test_scan(self):
         """
         R21. <Scan> ::= scan ( <IDs> );
