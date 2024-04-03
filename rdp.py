@@ -160,7 +160,7 @@ class RDP:
     """
     next_token = self.lexer.get_next_token()
     if next_token.type == 'identifier':
-      print(f"Token: Identifier          Lexeme: {next_token.value}")
+      print(f"Token: Identifier          Lexeme: {next_token.value}") #
       return True
     self.lexer.backtrack()
 
