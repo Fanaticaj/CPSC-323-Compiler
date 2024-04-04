@@ -398,7 +398,7 @@ class TestRDP(unittest.TestCase):
         is_scan = parser.scan()
         self.assertTrue(is_scan, f"Not recognized as scan: {source}")
         
-    def test_while(self):
+    def test_While(self):
         """
         R22. <While> ::= while ( <Condition> ) <Statement> endwhile
         """
@@ -528,6 +528,16 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_primary = parser.primary()
             self.assertTrue(is_primary, f"Not recognized as primary: {p}")
+            
+    def test_empty(self):
+        """
+        R31. <Empty> ::= None
+        """
+        empty = ''
+        l = Lexer(empty)
+        parser = RDP(l)
+        is_empty = parser.empty()
+        self.assertTrue(is_empty, f"Not recognized as Empty: {empty}")
 
 if __name__ == "__main__":
     unittest.main()
