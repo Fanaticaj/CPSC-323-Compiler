@@ -23,23 +23,47 @@ class RDP:
     return False
     
   def rat24s(self):
-    """
-    R1. <Rat24S> ::= $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $
-    """
-    print("Token: Symbol          Lexeme: $")
-    print("<Rat24S> ::= $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $")
-    if self.token_is('symbol', '$'):
-      self.opt_function_definitions()
-      if self.token_is('symbol', '$'):
-        self.opt_declaration_list()
-        if self.token_is('symbol', '$'):
-          self.statement_list()
-          if self.token_is('symbol', '$'):
-            print("Parsing <Rat24S> successful.")
-            return True
-    print("Parsing <Rat24S> failed.")
-    return False
-  
+      """
+      R1. <Rat24S> ::= $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $
+      """
+      # Check for the first $ symbol.
+      if not self.token_is('symbol', '$'):
+          print("Error: Expected '$' at the beginning of the program.")
+          return False
+
+      # Optionally parse function definitions.
+      if not self.opt_function_definitions():
+          print("Error: Issue parsing optional function definitions.")
+          return False
+
+      # Check for the $ symbol after optional function definitions.
+      if not self.token_is('symbol', '$'):
+          print("Error: Expected '$' after optional function definitions.")
+          return False
+
+      # Optionally parse declaration list.
+      if not self.opt_declaration_list():
+          print("Error: Issue parsing optional declaration list.")
+          return False
+
+      # Check for the $ symbol after optional declaration list.
+      if not self.token_is('symbol', '$'):
+          print("Error: Expected '$' after optional declaration list.")
+          return False
+
+      # Parse statement list.
+      if not self.statement_list():
+          print("Error: Issue parsing statement list.")
+          return False
+
+      # Check for the final $ symbol indicating the end of the program.
+      if not self.token_is('symbol', '$'):
+          print("Error: Expected final '$' at the end of the program.")
+          return False
+
+      print("Parsing <Rat24S> successful.")
+      return True
+
   def opt_function_definitions(self):
     """
     R2. <Opt Function Definitions> ::= <Function Definitions> | <Empty>
@@ -72,19 +96,33 @@ class RDP:
         return False
 
   def function(self):
-    """
-    R4. <Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>
-    """
-    print("<Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>")
-    if self.token_is('keyword', 'function'):
-      if self.IDs():
-        if self.token_is('separator', '('):
-          self.opt_parameter_list()
-          if self.token_is('separator', ')'):
-            self.opt_declaration_list()
-            self.body()
-            return True
-    return False
+      """
+      R4. <Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>
+      """
+      print("<Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>")
+      if self.token_is('keyword', 'function'):
+          # Expecting a single identifier for the function name.
+          if self.token_is('identifier'):  # Adjusted from IDs() to expect a single identifier.
+              if self.token_is('separator', '('):
+                  if self.opt_parameter_list():  # Parse optional parameter list.
+                      if self.token_is('separator', ')'):
+                          if self.opt_declaration_list():  # Parse optional declaration list.
+                              if self.body():  # Parse the function body.
+                                  return True
+                              else:
+                                  print("Error: Invalid function body.")
+                          else:
+                              print("Error: Issue within optional declaration list.")
+                      else:
+                          print("Error: Expected ')' after parameters.")
+                  else:
+                      print("Error: Issue within optional parameter list.")
+              else:
+                  print("Error: Expected '(' after function name.")
+          else:
+              print("Error: Expected identifier after 'function' keyword.")
+      return False
+
   
   def opt_parameter_list(self):
     """
