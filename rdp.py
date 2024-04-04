@@ -59,7 +59,7 @@ class RDP:
     if self.function():
         # After parsing one function, attempt to parse additional functions until no more can be parsed.
         while True:
-            lookahead_token = self.lexer.get_next_token()  # Peek, don't consume.
+            lookahead_token = self.lexer.get_next_token()
             if lookahead_token and lookahead_token.type == 'keyword' and lookahead_token.value == 'function':
                 if not self.function():
                     # If there's a failure in parsing the next function, break the loop                    # or you could handle it differently based on your error recovery strategy.
