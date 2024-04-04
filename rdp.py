@@ -98,26 +98,28 @@ class RDP:
     return False
   
   def parameter_list(self):
-    """
-    R6. <Parameter List> ::= <Parameter> | <Parameter> , <Parameter List>
-    """
-    print("<Parameter List> ::= <Parameter> | <Parameter>, <Parameter List>")
-    if self.parameter():
-        # While loop for handling comma-separated parameter list.
-        while True:
-            current_token = self.lexer.get_next_token()
-            if current_token.type == 'separator' and current_token.value == ',':
-                self.lexer.get_next_token()
-                print("Token: Separator          Lexeme: ,")
-                if not self.parameter():
-                    print("Error: Expected a parameter after ','.")
-                    return False
-            else:
-                break
-    else:
-        print("Error: Expected a parameter.")
-        return False
-    return True
+      """
+      R6. <Parameter List> ::= <Parameter> | <Parameter>, <Parameter List>
+      """
+      print("<Parameter List> ::= <Parameter> | <Parameter>, <Parameter List>")
+      if self.parameter():
+          # While loop for handling comma-separated parameter list.
+          while True:
+              # Utilize token_is for checking the comma separator.
+              if self.token_is('separator', ','):
+                  print("Token: Separator          Lexeme: ,")
+                  if not self.parameter():
+                      print("Error: Expected a parameter after ','.")
+                      return False
+              else:
+                  # If token_is returned False, it means the next token is not a comma,
+                  # and the lexer's position has been reset by backtrack in token_is.
+                  # This means we are ready to exit the loop.
+                  break
+      else:
+          print("Error: Expected a parameter.")
+          return False
+      return True
   
   def parameter(self):
     """
