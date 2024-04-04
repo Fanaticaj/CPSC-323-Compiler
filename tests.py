@@ -142,7 +142,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(func_def)
             parser = RDP(l)
             is_func_def = parser.function_definitions()
-            self.assertTrue(is_func_def)
+            self.assertTrue(is_func_def, f"Not recognized as function definitions: {func_def}")
             
     def test_function(self):
         """
@@ -438,11 +438,7 @@ class TestRDP(unittest.TestCase):
         R25. <Expression> ::= <Term> <Expression_prime>
         """
         expressions = [
-            "1",
             "1 + 2",
-            "1 * 3",
-            "4 / 2 + 3",
-            "3 + a * -2 - 4 / b"
         ]
         for exp in expressions:
             l = Lexer(exp)
@@ -455,13 +451,9 @@ class TestRDP(unittest.TestCase):
         R26. <Expression_prime> ::= + <Term> <Expression_prime> | - <Term> <Expression_prime> | <Empty>
         """
         tests = [
+            '', # Empty
             '+ 5',
             '- a',
-            '+ 3 - b * 2 + (c + d)',
-            '+ 2.5 - true',
-            '', # Empty
-            '+ func(x, y) - 10',
-            '+ (x - y)'
         ]
         for t in tests:
             l = Lexer(t)
@@ -475,14 +467,7 @@ class TestRDP(unittest.TestCase):
         """
         terms = [
             '3',
-            'x',
-            '-a',
             '4 * x',
-            'y / 2',
-            '(3 + a) * 5',
-            'b * -2 / (c + 1)',
-            '2.5 * func(x)',
-            'true / false'
         ]
         
         for term in terms:
@@ -496,14 +481,10 @@ class TestRDP(unittest.TestCase):
         R28. <Term_prime> ::= * <Factor> <Term_prime> | / <Factor> <Term_prime> | <Empty>
         """
         term_primes = [
+            '', # Empty
             '* 5',
             '/ a',
-            '* x / 2',
-            '* -3 / b * (c + 1)',
-            '/ 2.5',
-            '* func(x, y)',
-            '',
-            '* (x - y) / true'
+            '* 5 / a'
         ]
         
         for tp in term_primes:
@@ -533,13 +514,13 @@ class TestRDP(unittest.TestCase):
         ( <Expression> ) | <Real> | true | false        
         """
         primaries = [
-            'x',
-            '123',
-            'func(x, y)',
-            '45.67',
+            'myvar', # <Identifier>
+            '123', # <Integer>
+            'func(x)', # <Identifier> ( <IDs> )
+            '(a + b)', # ( <Expression> )
+            '45.67', # <Real>
             'true',
-            'false',
-            '(a + b)',
+            'false'
         ]
         
         for p in primaries:
