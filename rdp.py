@@ -54,7 +54,22 @@ class RDP:
     """
     R3. <Function Definitions> ::= <Function> | <Function> <Function Definitions>
     """
-    raise NotImplementedError
+    print("<Function Definitions> ::= <Function> | <Function> <Function Definitions>")
+    # Attempt to parse the first function. If successful, enter a loop to try and parse additional functions.
+    if self.function():
+        # After parsing one function, attempt to parse additional functions until no more can be parsed.
+        while True:
+            lookahead_token = self.lexer.get_next_token()  # Peek, don't consume.
+            if lookahead_token and lookahead_token.type == 'keyword' and lookahead_token.value == 'function':
+                if not self.function():
+                    # If there's a failure in parsing the next function, break the loop                    # or you could handle it differently based on your error recovery strategy.
+                    break
+            else:
+                # If the next token doesn't indicate the start of a function, exit the loop.
+                break
+        return True
+    else:
+        return False
 
   def function(self):
     """
