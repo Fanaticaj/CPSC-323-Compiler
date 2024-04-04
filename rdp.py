@@ -48,7 +48,6 @@ class RDP:
     if not self.function_definitions():  # Attempt parsing <Function Definitions>
       self.empty()  # If it fails, treat as empty
       return True
-
     return False
   
   def function_definitions(self):
@@ -81,7 +80,6 @@ class RDP:
     if not self.parameter_list():  # If no parameter list found, treat as empty.
         self.empty()
         return True
-  
     return False
   
   def parameter_list(self):
@@ -125,9 +123,7 @@ class RDP:
       return True
     elif self.token_is('keyword', 'real'):
       return True
-    
     return False
-      
   
   def body(self):
     """
@@ -152,19 +148,51 @@ class RDP:
     """
     R9. <Opt Declaration List> ::= <Declaration List> | <Empty>
     """
-    raise NotImplementedError
+    print("<Opt Declaration List> ::= <Declaration List> | <Empty>")
+    lookahead_token = self.lexer.get_next_token()
+    # Check if the lookahead token could start a declaration
+    if lookahead_token.type == 'keyword' and lookahead_token.value in ['integer', 'boolean', 'real']:
+        return self.declaration_list()
+    else:
+        return self.empty()  # effectively doing nothing, as it's an optional list
   
   def declaration_list(self):
     """
     R10. <Declaration List> := <Declaration> ; | <Declaration> ; <Declaration List>
     """
-    raise NotImplementedError
+    print("<Declaration List> ::= <Declaration> ; | <Declaration> ; <Declaration List>")
+    if self.declaration():
+        while self.token_is('separator', ';'):
+            print("Token: Separator          Lexeme: ;")
+            # Check if there's another declaration following
+            lookahead_token = self.lexer.peek_next_token()
+            if lookahead_token.type == 'keyword' and lookahead_token.value in ['integer', 'boolean', 'real']:
+                if not self.declaration():
+                    return False
+            else:
+                break
+        return True
+    return False
   
   def declaration(self):
     """
     R11. <Declaration> ::= integer <IDs> | boolean <IDs> | real <IDs>
     """
-    raise NotImplementedError
+    lookahead_token = self.lexer.get_next_token()
+    if lookahead_token.type != 'keyword' or lookahead_token.value not in ['integer', 'boolean', 'real']:
+        return False  # Not a declaration
+    
+    # Now consume the type keyword
+    type_token = self.lexer.get_next_token()
+    print(f"Token: Keyword          Lexeme: {type_token.value}")
+    print(f"<Declaration> ::= {type_token.value} <IDs>")
+    
+    # Proceed to parse the IDs
+    if not self.IDs():
+        print("Error: Expected identifier list after type keyword.")
+        return False
+    
+    return True
   
   def IDs(self):
     """
@@ -177,8 +205,6 @@ class RDP:
       print(f"Token: Identifier          Lexeme: {next_token.value}") #
       return True
     self.lexer.backtrack()
-
-    raise NotImplementedError
   
   def statement_list(self):
     """
