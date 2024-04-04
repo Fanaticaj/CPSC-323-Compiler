@@ -103,7 +103,9 @@ class TestRDP(unittest.TestCase):
         """
         programs = [
             '$ $ $ print (true); $',
-            '$function oea3 ( ) {if  ( -(  false/-0.322/ - 0--6.5 /- 69* - 1*  - false /-    false /  na   )  +3.13+wf( usjn,rux, zbqpo)=> -  5 +b(jctn ) +-u ( hv7, o2 , g69q) /  -p(y7j,     dp  , hl)) return;endif  } function dc(  ) {return;}$integerdu, yg3; $return    ; $ '
+            '$ function myvar () { print (true); } $ $ print (true); $',
+            '$ $ integer myint ; $ print (true); $',
+            '$ function myvar () { print (true); } $ integer myint ; $ print (true);$'
         ]
         
         for program in programs:
@@ -118,8 +120,7 @@ class TestRDP(unittest.TestCase):
         """
         tests = [
             '', # Empty
-            'function myfunc() boolean b2t ;boolean m4; {x =( -y (zt)* true *29.18 / x35zeh ) + false; }',
-            'function k25jl( ) boolean b2t ;booleanm4; {s8ado =( -io6n  (z92t   )* true    *29.18 / x35zeh ) + - false ;}'
+            'function myvar () { print (true); }'
         ]
         
         for t in tests:
@@ -133,14 +134,14 @@ class TestRDP(unittest.TestCase):
         R3. <Function Definitions> ::= <Function> | <Function> <Function Definitions>
         """
         function_defs = [
-            'function myfunc() boolean b2t ;boolean m4; {x =( -y (zt)* true *29.18 / x35zeh ) + false; }',
-            'function myfunc() boolean b2t ;boolean m4; {x =( -y (zt)* true *29.18 / x35zeh ) + false; } function myfunc() boolean b2t; {x=29;}'
+            'function myvar () { print (true); }',
+            'function myvar () { print (true); } function mysecondvar () { print (false); }'
         ]
         
         for func_def in function_defs:
             l = Lexer(func_def)
             parser = RDP(l)
-            is_func_def = parser.function_definitions
+            is_func_def = parser.function_definitions()
             self.assertTrue(is_func_def)
             
     def test_function(self):
