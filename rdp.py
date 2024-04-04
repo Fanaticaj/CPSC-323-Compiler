@@ -38,7 +38,7 @@ class RDP:
             print("Parsing <Rat24S> successful.")
             return True
     print("Parsing <Rat24S> failed.")
-    raise NotImplementedError
+    return False
   
   def opt_function_definitions(self):
     """
@@ -49,7 +49,7 @@ class RDP:
       self.empty()  # If it fails, treat as empty
       return True
 
-    raise NotImplementedError
+    return False
   
   def function_definitions(self):
     """
@@ -70,7 +70,7 @@ class RDP:
             self.opt_declaration_list()
             self.body()
             return True
-    raise NotImplementedError
+    return False
   
   def opt_parameter_list(self):
     """
@@ -82,7 +82,7 @@ class RDP:
         self.empty()
         return True
   
-    raise NotImplementedError
+    return False
   
   def parameter_list(self):
     """
@@ -106,8 +106,6 @@ class RDP:
         return False
     return True
   
-    raise NotImplementedError
-  
   def parameter(self):
     """
     R7. <Parameter> ::= <IDs> <Qualifier>
@@ -116,8 +114,7 @@ class RDP:
     if self.IDs() and self.qualifier():
         return True
     return False
-    raise NotImplementedError
-  
+    
   def qualifier(self):
     """
     R8. <Qualifier> ::= integer | boolean | real
@@ -150,7 +147,6 @@ class RDP:
     else:
         print("Error: Expected '{' at the beginning of the body.")
     return False
-    raise NotImplementedError
   
   def opt_declaration_list(self):
     """
