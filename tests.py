@@ -113,6 +113,8 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_program = parser.rat24s()
             self.assertTrue(is_program, f"Not recognized as rat24s program: {program}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
+
             
     def test_opt_function_definitions(self):
         """
@@ -128,6 +130,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_opt_function_definition = parser.opt_function_definitions()
             self.assertTrue(is_opt_function_definition, f"Not recognized as Opt Function Definitions: {t}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
         
     def test_function_definitions(self):
         """
@@ -143,6 +146,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_func_def = parser.function_definitions()
             self.assertTrue(is_func_def, f"Not recognized as function definitions: {func_def}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_function(self):
         """
@@ -159,6 +163,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_func = parser.function()
             self.assertTrue(is_func, f"Not recognized as a function: {func}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_opt_parameter_list(self):
         """
@@ -174,6 +179,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_opt_param_list = parser.opt_parameter_list()
             self.assertTrue(is_opt_param_list, f"Not recognized as Opt Parameter List: {opt_param_list}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_parameter_list(self):
         """
@@ -189,6 +195,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_param_list = parser.parameter_list()
             self.assertTrue(is_param_list, f"Not recognized as Parameter List: {param_list}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_parameter(self):
         """
@@ -199,6 +206,7 @@ class TestRDP(unittest.TestCase):
         parser = RDP(l)
         is_param = parser.parameter()
         self.assertTrue(is_param, f"Not recognized as parameter: {param}")
+        self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
         
     def test_qualifier(self):
         """
@@ -210,6 +218,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_qualifier = parser.qualifier()
             self.assertTrue(is_qualifier, f"Not recognized as qualifier: {q}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_body(self):
         """
@@ -220,6 +229,7 @@ class TestRDP(unittest.TestCase):
         parser = RDP(l)
         is_body = parser.body()
         self.assertTrue(is_body, f"Not recognized as Body: {body}")
+        self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
         
     def test_opt_declaration_list(self):
         """
@@ -235,6 +245,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_opt_declartion_list = parser.opt_declaration_list()
             self.assertTrue(is_opt_declartion_list, f"Not recognized as Opt Declaration List: {odl}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_declaration_list(self):
         """
@@ -250,6 +261,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_dec_list = parser.declaration_list()
             self.assertTrue(is_dec_list, f"Not recognized as Declaration List: {dec_list}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_declaration(self):
         """
@@ -266,6 +278,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_dec = parser.declaration()
             self.assertTrue(is_dec, f"Not recognized as Declaration: {dec}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_IDs(self):
         """
@@ -281,7 +294,8 @@ class TestRDP(unittest.TestCase):
             l = Lexer(id)
             parser = RDP(l)
             is_IDs = parser.IDs()
-            self.assertTrue(is_IDs, f"Not recognized as IDs: {id}")
+            self.assertTrue(is_IDs, f"Not recognized as IDs: {id}")      
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_statement_list(self):
         """
@@ -297,6 +311,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_statement_list = parser.statement_list()
             self.assertTrue(is_statement_list, f"Not recognized as Statement List: {statement_list}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_statement(self):
         """
@@ -317,6 +332,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_statement = parser.statement()
             self.assertTrue(is_statement, f"Not recognized as Statement: {statement}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
 
     def test_compound(self):
         """
@@ -327,6 +343,7 @@ class TestRDP(unittest.TestCase):
         parser = RDP(l)
         is_compound = parser.compound()
         self.assertTrue(is_compound, f"Not recognized as Compound: {compound}")
+        self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
         
     def test_assign(self):
         """
@@ -337,6 +354,7 @@ class TestRDP(unittest.TestCase):
         parser = RDP(l)
         is_assign = parser.assign()
         self.assertTrue(is_assign, f"Not recognized as Assign: {assign}")
+        self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
         
     def test_If(self):
         """
@@ -347,6 +365,7 @@ class TestRDP(unittest.TestCase):
         parser = RDP(l)
         is_If = parser.If()
         self.assertTrue(is_If, f"Not recognized as If: {if_statement}")
+        self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
         
     def test_If_prime(self):
         """
@@ -362,6 +381,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_If_prime = parser.If_prime()
             self.assertTrue(is_If_prime, f"Not recognized as If_prime: {if_prime}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_Return(self):
         """
@@ -377,6 +397,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_return = parser.Return()
             self.assertTrue(is_return, f"Not recognized as Return: {r}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_Print(self):
         """
@@ -387,6 +408,7 @@ class TestRDP(unittest.TestCase):
         parser = RDP(l)
         is_Print = parser.Print()
         self.assertTrue(is_Print, f"Not recognized as Print: {print_statement}")
+        self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
 
     def test_scan(self):
         """
@@ -397,6 +419,7 @@ class TestRDP(unittest.TestCase):
         parser = RDP(l)
         is_scan = parser.scan()
         self.assertTrue(is_scan, f"Not recognized as scan: {source}")
+        self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
         
     def test_While(self):
         """
@@ -407,6 +430,7 @@ class TestRDP(unittest.TestCase):
         parser = RDP(l)
         is_while = parser.While()
         self.assertTrue(is_while, f"Not recognized as while: {source}")
+        self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
         
     def test_condition(self):
         """
@@ -419,7 +443,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_condition = parser.condition()
             self.assertTrue(is_condition, f"Not recognized as condition: {condition}")
-            
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
     
     def test_relop(self):
         """
@@ -432,6 +456,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_relop = parser.relop()
             self.assertTrue(is_relop, f"Not recognized as operator: {op}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_expression(self):
         """
@@ -445,6 +470,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_exp = parser.expression()
             self.assertTrue(is_exp, f"Not recognized as expression: {exp}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_expression_prime(self):
         """
@@ -460,6 +486,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_expression_prime = parser.expression_prime()
             self.assertTrue(is_expression_prime, f"Not recognized as expression prime: {t}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_term(self):
         """
@@ -475,6 +502,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_term = parser.term()
             self.assertTrue(is_term, f"Not recognized as term: {term}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_term_prime(self):
         """
@@ -492,6 +520,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_term_prime = parser.term_prime()
             self.assertTrue(is_term_prime, f"Not recognized as term prime: {tp}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_factor(self):
         """
@@ -507,6 +536,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_factor = parser.factor()
             self.assertTrue(is_factor, f"Not recognized as factor: {f}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_primary(self):
         """
@@ -528,6 +558,7 @@ class TestRDP(unittest.TestCase):
             parser = RDP(l)
             is_primary = parser.primary()
             self.assertTrue(is_primary, f"Not recognized as primary: {p}")
+            self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
             
     def test_empty(self):
         """
@@ -538,6 +569,7 @@ class TestRDP(unittest.TestCase):
         parser = RDP(l)
         is_empty = parser.empty()
         self.assertTrue(is_empty, f"Not recognized as Empty: {empty}")
+        self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)}")
 
 if __name__ == "__main__":
     unittest.main()
