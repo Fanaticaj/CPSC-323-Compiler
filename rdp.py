@@ -92,10 +92,11 @@ class RDP:
     """
     print("<Opt Parameter List> ::= <Parameter List> | <Empty>")
     # Attempt to parse a parameter list. If successful, the parameter_list function will handle its own logging.
-    if not self.parameter_list():  # If no parameter list found, treat as empty.
-        self.empty()
+    if self.parameter_list():  # If no parameter list found, treat as empty.
         return True
-    return False
+    else:
+      self.empty()
+      return True
   
   def parameter_list(self):
       """
@@ -212,17 +213,22 @@ class RDP:
     return True
   
   def IDs(self):
-    """
-    R12. <IDs> ::= <Identifier> | <Identifier>, <IDs>
-    """
-    next_token = self.lexer.get_next_token()
-    if next_token is None:
-      return False
-    if next_token.type == 'identifier':
-      print(f"Token: Identifier          Lexeme: {next_token.value}") #
-      return True
-    self.lexer.backtrack()
-  
+      """
+      R12. <IDs> ::= <Identifier> | <Identifier>, <IDs>
+      """
+      # Attempt to parse the first identifier.
+      if self.token_is('identifier'):
+          # Successfully parsed an identifier, now look for a comma indicating more identifiers.
+          while self.token_is('separator', ','):
+              print("Token: Separator          Lexeme: ,")
+              if not self.token_is('identifier'):
+                  print("Error: Expected an identifier after ','.")
+                  return False
+          return True
+      else:
+          print("Error: Expected an identifier.")
+          return False
+
   def statement_list(self):
     """
     R13. <Statement List> ::= <Statement> | <Statement> <Statement List>
