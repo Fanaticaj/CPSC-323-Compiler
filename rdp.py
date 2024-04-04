@@ -135,6 +135,8 @@ class RDP:
     """
     R8. <Qualifier> ::= integer | boolean | real
     """
+    print("R8. <Qualifier> ::= integer | boolean | real")
+
     if self.token_is('keyword', 'integer'):
       return True
     elif self.token_is('keyword', 'boolean'):
@@ -163,55 +165,64 @@ class RDP:
     return False
   
   def opt_declaration_list(self):
-    """
-    R9. <Opt Declaration List> ::= <Declaration List> | <Empty>
-    """
-    print("<Opt Declaration List> ::= <Declaration List> | <Empty>")
-    lookahead_token = self.lexer.get_next_token()
-    # Check if the lookahead token could start a declaration
-    if lookahead_token.type == 'keyword' and lookahead_token.value in ['integer', 'boolean', 'real']:
-        return self.declaration_list()
-    else:
-        return self.empty()  # effectively doing nothing, as it's an optional list
+      """
+      R9. <Opt Declaration List> ::= <Declaration List> | <Empty>
+      """
+      print("<Opt Declaration List> ::= <Declaration List> | <Empty>")
+      # Peek at the next token without consuming it.
+      lookahead_token = self.lexer.peek_next_token()
+      # Ensure lookahead_token is not None before accessing its attributes.
+      if lookahead_token is not None and lookahead_token.type == 'keyword' and lookahead_token.value in ['integer', 'boolean', 'real']:
+          # If the lookahead token could start a declaration, attempt to parse the declaration list.
+          if self.declaration_list():
+              return True
+          else:
+              return False
+      else:
+          # If the next token does not indicate the start of a declaration list or if we're at the end of input, treat this as an empty list.
+          self.empty()
+          return True  # Return True because the declaration list is optional and absence of a declaration list is not an error.
   
   def declaration_list(self):
-    """
-    R10. <Declaration List> := <Declaration> ; | <Declaration> ; <Declaration List>
-    """
-    print("<Declaration List> ::= <Declaration> ; | <Declaration> ; <Declaration List>")
-    if self.declaration():
-        while self.token_is('separator', ';'):
-            print("Token: Separator          Lexeme: ;")
-            # Check if there's another declaration following
-            lookahead_token = self.lexer.peek_next_token()
-            if lookahead_token.type == 'keyword' and lookahead_token.value in ['integer', 'boolean', 'real']:
-                if not self.declaration():
-                    return False
-            else:
-                break
-        return True
-    return False
+      """
+      R10. <Declaration List> := <Declaration> ; | <Declaration> ; <Declaration List>
+      """
+      print("<Declaration List> ::= <Declaration> ; | <Declaration> ; <Declaration List>")
+      # Attempt the first declaration.
+      if not self.declaration():
+          return False
+
+      # After a successful declaration, expect a semicolon.
+      while True:
+          if self.token_is('separator', ';'):
+              print("Token: Separator          Lexeme: ;")
+              # Attempt to parse another declaration directly.
+              if not self.declaration():
+                  # If False, we've reached the end of valid declarations or hit an improperly formatted declaration.
+                  break
+          else:
+              # If the next token isn't a semicolon, we've exited the declaration list properly.
+              break
+      
+      return True
   
   def declaration(self):
     """
     R11. <Declaration> ::= integer <IDs> | boolean <IDs> | real <IDs>
     """
-    lookahead_token = self.lexer.get_next_token()
-    if lookahead_token.type != 'keyword' or lookahead_token.value not in ['integer', 'boolean', 'real']:
-        return False  # Not a declaration
-    
-    # Now consume the type keyword
-    type_token = self.lexer.get_next_token()
-    print(f"Token: Keyword          Lexeme: {type_token.value}")
-    print(f"<Declaration> ::= {type_token.value} <IDs>")
-    
-    # Proceed to parse the IDs
-    if not self.IDs():
-        print("Error: Expected identifier list after type keyword.")
+    # Use token_is to check for and consume the type keyword in one step.
+    if self.token_is('keyword', 'integer') or self.token_is('keyword', 'boolean') or self.token_is('keyword', 'real'):
+        # Proceed to parse the IDs.
+        if not self.IDs():
+            print("Error: Expected identifier list after type keyword.")
+            return False
+
+        # If we successfully parse the IDs after the type keyword, the declaration is successful.
+        return True
+    else:
+        # If the next token is not a type keyword, it's not a declaration.
         return False
-    
-    return True
-  
+
   def IDs(self):
       """
       R12. <IDs> ::= <Identifier> | <Identifier>, <IDs>
