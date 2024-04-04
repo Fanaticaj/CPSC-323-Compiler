@@ -158,7 +158,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(func)
             parser = RDP(l)
             is_func = parser.function()
-            self.assertTrue(is_func)
+            self.assertTrue(is_func, f"Not recognized as a function: {func}")
             
     def test_opt_parameter_list(self):
         """
@@ -173,7 +173,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(opt_param_list)
             parser = RDP(l)
             is_opt_param_list = parser.opt_parameter_list()
-            self.assertTrue(is_opt_param_list)
+            self.assertTrue(is_opt_param_list, f"Not recognized as Opt Parameter List: {opt_param_list}")
             
     def test_parameter_list(self):
         """
@@ -188,7 +188,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(param_list)
             parser = RDP(l)
             is_param_list = parser.parameter_list()
-            self.assertTrue(is_param_list)
+            self.assertTrue(is_param_list, f"Not recognized as Parameter List: {param_list}")
             
     def test_parameter(self):
         """
@@ -198,7 +198,7 @@ class TestRDP(unittest.TestCase):
         l = Lexer(param)
         parser = RDP(l)
         is_param = parser.parameter()
-        self.assertTrue(is_param)
+        self.assertTrue(is_param, f"Not recognized as parameter: {param}")
         
     def test_qualifier(self):
         """
@@ -209,7 +209,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(q)
             parser = RDP(l)
             is_qualifier = parser.qualifier()
-            self.assertTrue(is_qualifier)
+            self.assertTrue(is_qualifier, f"Not recognized as qualifier: {q}")
             
     def test_body(self):
         """
@@ -219,7 +219,7 @@ class TestRDP(unittest.TestCase):
         l = Lexer(body)
         parser = RDP(l)
         is_body = parser.body()
-        self.assertTrue(is_body)
+        self.assertTrue(is_body, f"Not recognized as Body: {body}")
         
     def test_opt_declaration_list(self):
         """
@@ -234,7 +234,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(odl)
             parser = RDP(l)
             is_opt_declartion_list = parser.opt_declaration_list()
-            self.assertTrue(is_opt_declartion_list)
+            self.assertTrue(is_opt_declartion_list, f"Not recognized as Opt Declaration List: {odl}")
             
     def test_declaration_list(self):
         """
@@ -249,7 +249,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(dec_list)
             parser = RDP(l)
             is_dec_list = parser.declaration_list()
-            self.assertTrue(is_dec_list)
+            self.assertTrue(is_dec_list, f"Not recognized as Declaration List: {dec_list}")
             
     def test_declaration(self):
         """
@@ -265,7 +265,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(dec)
             parser = RDP(l)
             is_dec = parser.declaration()
-            self.assertTrue(is_dec)
+            self.assertTrue(is_dec, f"Not recognized as Declaration: {dec}")
             
     def test_IDs(self):
         """
@@ -281,7 +281,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(id)
             parser = RDP(l)
             is_IDs = parser.IDs()
-            self.assertTrue(is_IDs)
+            self.assertTrue(is_IDs, f"Not recognized as IDs: {id}")
             
     def test_statement_list(self):
         """
@@ -296,7 +296,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(statement_list)
             parser = RDP(l)
             is_statement_list = parser.statement_list()
-            self.assertTrue(is_statement_list)
+            self.assertTrue(is_statement_list, f"Not recognized as Statement List: {statement_list}")
             
     def test_statement(self):
         """
@@ -316,7 +316,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(statement)
             parser = RDP(l)
             is_statement = parser.statement()
-            self.assertTrue(is_statement)
+            self.assertTrue(is_statement, f"Not recognized as Statement: {statement}")
 
     def test_compound(self):
         """
@@ -326,7 +326,7 @@ class TestRDP(unittest.TestCase):
         l = Lexer(compound)
         parser = RDP(l)
         is_compound = parser.compound()
-        self.assertTrue(is_compound)
+        self.assertTrue(is_compound, f"Not recognized as Compound: {compound}")
         
     def test_assign(self):
         """
@@ -336,7 +336,7 @@ class TestRDP(unittest.TestCase):
         l = Lexer(assign)
         parser = RDP(l)
         is_assign = parser.assign()
-        self.assertTrue(is_assign)
+        self.assertTrue(is_assign, f"Not recognized as Assign: {assign}")
         
     def test_If(self):
         """
@@ -346,7 +346,7 @@ class TestRDP(unittest.TestCase):
         l = Lexer(if_statement)
         parser = RDP(l)
         is_If = parser.If()
-        self.assertTrue(is_If)
+        self.assertTrue(is_If, f"Not recognized as If: {if_statement}")
         
     def test_If_prime(self):
         """
@@ -361,7 +361,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(if_prime)
             parser = RDP(l)
             is_If_prime = parser.If_prime()
-            self.assertTrue(is_If_prime)
+            self.assertTrue(is_If_prime, f"Not recognized as If_prime: {if_prime}")
             
     def test_Return(self):
         """
@@ -376,7 +376,7 @@ class TestRDP(unittest.TestCase):
             l = Lexer(r)
             parser = RDP(l)
             is_return = parser.Return()
-            self.assertTrue(is_return)
+            self.assertTrue(is_return, f"Not recognized as Return: {r}")
             
     def test_Print(self):
         """
@@ -386,7 +386,7 @@ class TestRDP(unittest.TestCase):
         l = Lexer(print_statement)
         parser = RDP(l)
         is_Print = parser.Print()
-        self.assertTrue(is_Print)
+        self.assertTrue(is_Print, f"Not recognized as Print: {print_statement}")
 
     def test_scan(self):
         """
