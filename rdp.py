@@ -27,7 +27,7 @@ class RDP:
       R1. <Rat24S> ::= $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $
       """
       # Check for the first $ symbol.
-      if not self.token_is('symbol', '$'):
+      if not self.token_is('separator', '$'):
           print("Error: Expected '$' at the beginning of the program.")
           return False
 
@@ -37,7 +37,7 @@ class RDP:
           return False
 
       # Check for the $ symbol after optional function definitions.
-      if not self.token_is('symbol', '$'):
+      if not self.token_is('separator', '$'):
           print("Error: Expected '$' after optional function definitions.")
           return False
 
@@ -47,7 +47,7 @@ class RDP:
           return False
 
       # Check for the $ symbol after optional declaration list.
-      if not self.token_is('symbol', '$'):
+      if not self.token_is('separator', '$'):
           print("Error: Expected '$' after optional declaration list.")
           return False
 
@@ -57,7 +57,7 @@ class RDP:
           return False
 
       # Check for the final $ symbol indicating the end of the program.
-      if not self.token_is('symbol', '$'):
+      if not self.token_is('separator', '$'):
           print("Error: Expected final '$' at the end of the program.")
           return False
 
