@@ -2,10 +2,10 @@
 from lexer import Lexer
 
 class RDP:
-  def __init__(self, lexer, print_to_console=True, write_to_file=True):
+  def __init__(self, lexer, *, print_to_console=False, out_filename=None):
     self.lexer = lexer
     self.print_to_console = print_to_console
-    self.write_to_file = write_to_file
+    self.out_filename = out_filename
     self.print_buffer = []  # Used to print tokens after printing production
     # Store left-hand side of production until right-hand side is determined
     self.print_production_buffer = []
@@ -41,9 +41,10 @@ class RDP:
         
   def finish_production_print(self, production):
     """Print the right hand side of a production that was started but not finished"""
-    left_hand_side = ' '.join(self.print_production_buffer)
-    self.print_production_buffer.clear()
-    print(f"{'':2}{left_hand_side} {production}")
+    if self.print_to_console:
+      left_hand_side = ' '.join(self.print_production_buffer)
+      self.print_production_buffer.clear()
+      print(f"{'':2}{left_hand_side} {production}")
 
   def print_token(self, token):
     """Print token and append to file a token"""
@@ -122,7 +123,6 @@ class RDP:
       """
       R4. <Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>
       """
-      self.print_production("<Function Definitions> ::= <Function> | <Function> <Function Definitions>")
       if self.token_is('keyword', 'function'):
           # Expecting a single identifier for the function name.
           if self.token_is('identifier'):  # Adjusted from IDs() to expect a single identifier.
@@ -175,7 +175,6 @@ class RDP:
           while True:
               # Utilize token_is for checking the comma separator.
               if self.token_is('separator', ','):
-                  print("Token: Separator          Lexeme: ,")
                   if not self.parameter():
                       print("Error: Expected a parameter after ','.")
                       return False
