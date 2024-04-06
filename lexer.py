@@ -169,3 +169,10 @@ class Lexer:
             idx = 0
         
         return self.tokens[idx]
+    
+    def get_next_token_val(self):
+        """Return the value of the next token"""
+        if self.curr_token >= len(self.tokens):
+            return ''
+        next_token = self.tokens[self.curr_token]
+        return next_token.value
