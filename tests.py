@@ -574,7 +574,7 @@ class TestRDP(unittest.TestCase):
     def test_output(self):
         source = "a = b + c;"
         l = Lexer(source)
-        parser = RDP(l)
+        parser = RDP(l, print_to_console=True)
         parser.statement()
 
 if __name__ == "__main__":

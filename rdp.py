@@ -1,5 +1,4 @@
 """Recursive Descent Parser for Syntax Analysis"""
-from lexer import Lexer
 
 class RDP:
   def __init__(self, lexer, *, print_to_console=False, out_filename=None):
@@ -9,6 +8,11 @@ class RDP:
     self.print_buffer = []  # Used to print tokens after printing production
     # Store left-hand side of production until right-hand side is determined
     self.print_production_buffer = []
+    
+    # Clear out file if it is set
+    if self.out_filename:
+        with open(self.out_filename, 'w') as out_txt:
+          out_txt.write("")
     
   def token_is(self, token_type, token_val=None):
     """
@@ -33,23 +37,41 @@ class RDP:
   
   def print_production(self, production, *, to_be_continued=False):
     """Print and append to file the current production"""
+    prod = f"{'':2}{production}"
+    if to_be_continued:
+      self.print_production_buffer.append(prod)
     if self.print_to_console:
-      if to_be_continued:
-        self.print_production_buffer.append(production)
-      else:
-        print(f"{'':2}{production}")
+      print(prod)
+        
+    if self.out_filename:
+      # Append to outfile here
+      if not to_be_continued:
+        self.append_to_file(prod)
         
   def finish_production_print(self, production):
     """Print the right hand side of a production that was started but not finished"""
+    left_hand_side = ' '.join(self.print_production_buffer)
+    self.print_production_buffer.clear()
+    prod = f"{left_hand_side} {production}"
     if self.print_to_console:
-      left_hand_side = ' '.join(self.print_production_buffer)
-      self.print_production_buffer.clear()
-      print(f"{'':2}{left_hand_side} {production}")
+      print(prod)
+    
+    if self.out_filename:
+      self.append_to_file(prod)
 
   def print_token(self, token):
     """Print token and append to file a token"""
+    tok = f"Token: {token.type:15} Lexeme: {token.value}"
     if self.print_to_console:
-      print(f"Token: {token.type:15} Lexeme: {token.value}")
+      print(tok)
+      
+    if self.out_filename:
+      self.append_to_file(f"{tok}")
+      
+  def append_to_file(self, txt):
+    """Append txt to output file"""
+    with open(self.out_filename, 'a') as out_txt:
+      out_txt.write(f"{txt}\n")
       
   def rat24s(self):
       """
@@ -151,14 +173,14 @@ class RDP:
     """
     R5. <Opt Parameter List> ::= <Parameter List> | <Empty>
     """
-    first_terminal = 'identifier'
+    first_terminal_type = 'identifier'
     next_terminal = self.lexer.peek_next_token()
     if next_terminal is None:
       next_terminal_type = ''
     else:
       next_terminal_type = next_terminal.type
-    if next_terminal_type == 'identifier':
-      self.print_production("<Opt Parameter List> ::= <Parameter List>")
+    if next_terminal_type == first_terminal_type:
+      self.print_production("<Opt Parameter List> --> <Parameter List>")
     # Attempt to parse a parameter list. If successful, the parameter_list function will handle its own logging.
       if self.parameter_list():  # If no parameter list found, treat as empty.
           return True
@@ -169,7 +191,7 @@ class RDP:
       """
       R6. <Parameter List> ::= <Parameter> | <Parameter>, <Parameter List>
       """
-      self.print_production("<Parameter List> ::= <Parameter> | <Parameter>, <Parameter List>")
+      self.print_production("<Parameter List> --> <Parameter> | <Parameter>, <Parameter List>")
       if self.parameter():
           # While loop for handling comma-separated parameter list.
           while True:
@@ -191,7 +213,7 @@ class RDP:
     """
     R7. <Parameter> ::= <IDs> <Qualifier>
     """
-    self.print_production("<Parameter> ::= <IDs> <Qualifier>")
+    self.print_production("<Parameter> --> <IDs> <Qualifier>")
     if self.IDs() and self.qualifier():
         return True
     return False
@@ -313,7 +335,7 @@ class RDP:
     """
     R13. <Statement List> ::= <Statement> | <Statement> <Statement List>
     """
-    self.print_production("<Statement List> ::= <Statement> | <Statement> <Statement List>")
+    self.print_production("<Statement List> --> <Statement> | <Statement> <Statement List>")
     if self.statement():
       if self.statement_list():
         return True
@@ -436,7 +458,7 @@ class RDP:
     """
     if self.token_is('keyword', 'return'):
       self.finish_production_print("<Return>")
-      self.print_production("<Return> ::= return ; | return <Expression> ;")
+      self.print_production("<Return> --> return ; | return <Expression> ;")
       if self.token_is('separator', ';'):
         return True
       elif self.expression():
@@ -455,7 +477,7 @@ class RDP:
     """
     if self.token_is('keyword', 'print'):
       self.finish_production_print("<Print>")
-      self.print_production("<Print> ::= print ( <Expression>);")
+      self.print_production("<Print> --> print ( <Expression>);")
       if self.token_is('separator', '('):
         if self.expression():
           if self.token_is('separator', ')'):
@@ -476,7 +498,7 @@ class RDP:
     """
     if self.token_is('keyword', 'scan'):
       self.finish_production_print("<Scan>")
-      self.print_production("<Scan> ::= scan ( <IDs> );")
+      self.print_production("<Scan> --> scan ( <IDs> );")
       if self.token_is('separator', '('):
         if self.IDs():
           if self.token_is('separator', ')'):
@@ -497,7 +519,7 @@ class RDP:
     """
     if self.token_is('keyword', 'while'):
       self.finish_production_print("<While>")
-      self.print_production("<While> ::= while ( <Condition> ) <Statement> endwhile")
+      self.print_production("<While> --> while ( <Condition> ) <Statement> endwhile")
       if self.token_is('separator', '('):
         if self.condition():
           if self.token_is('separator', ')'):
