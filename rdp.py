@@ -282,48 +282,179 @@ class RDP:
     """
     R13. <Statement List> ::= <Statement> | <Statement> <Statement List>
     """
+    print("<Statement List> ::= <Statement> | <Statement> <Statement List>")
+    # Attempt to parse the first function. If successful, enter a loop to try and parse additional functions.
+    if self.statement():
+        # After parsing one function, attempt to parse additional functions until no more can be parsed.
+        while True:
+            lookahead_token = self.lexer.get_next_token()
+            if lookahead_token and lookahead_token.type == 'keyword' and lookahead_token.value == 'statement':
+                if not self.statement():
+                    # If there's a failure in parsing the next function, break the loop                    # or you could handle it differently based on your error recovery strategy.
+                    break
+            else:
+                # If the next token doesn't indicate the start of a function, exit the loop.
+                break
+        return True
+    else:
+        return False
+
     raise NotImplementedError
   
   def statement(self):
     """
     R14. <Statement> ::= <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
     """
+    if self.compound():
+      return True
+    elif self.assign():
+       return True
+    elif self.If():
+       return True
+    elif self.Return():
+       return True
+    elif self.Print():
+       return True
+    elif self.scan():
+       return True
+    elif self.While():
+       return True
+    else:
+       return False
     raise NotImplementedError
   
   def compound(self):
     """
     R15. <Compound> ::= { <Statement List> }
     """
+    print("<Compound> ::= { <Statement List> }")
+    if self.token_is('separator', '{'):
+        if self.statement_list():  # Process the statement list.
+            if self.token_is('separator', '}'):
+                return True
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
     raise NotImplementedError
   
   def assign(self):
     """
     R16. <Assign> ::= <Identifier> = <Expression> ;
     """
+    print("<Assign> ::= <Identifier> = <Expression> ;")
+    if self.IDs():
+          if self.token_is('operator', '='):
+        # Proceed to parse the IDs.
+            if self.expression():
+              if not self.token_is('separator',';'):
+                print("Error: Expected identifier list after type keyword.")
+                return False
+
+        # If we successfully parse the IDs after the type keyword, the declaration is successful.
+          return True
+    else:
+        # If the next token is not a type keyword, it's not a declaration.
+        return False
+    
     raise NotImplementedError
   
   def If(self):
     """
     R17. <If> ::= if ( <Condition> ) <Statement> <If_prime>
     """
+    print("<If> ::= if ( <Condition> ) <Statement> <If_prime>")
+    if self.token_is('keyword', 'if'):
+      if self.token_is('separator', '('):
+        if self.condition():
+          if self.token_is('separator', ')'):
+            if self.statement():
+              if self.If_prime():
+                 return True
+              else:
+                  return False
+            else:
+              return False
+          else:
+            return False
+        else:
+          return False
+      else:
+          return False
+    else:
+          return False
+
+              
     raise NotImplementedError
   
   def If_prime(self):
     """
     R18. <If_prime> ::= endif | else <Statement> endif
     """
+    print("<If_prime> ::= endif | else <Statement> endif")
+    if self.token_is('keyword','endif'):
+      return True
+    elif self.token_is('keyword','else'):
+      if self.token_is('separator','{'):
+        if self.statement():
+           if self.token_is('separator','}'):
+              if self.token_is('keyword','endif'):
+                 return True
+              else:
+                return False
+           else:
+              return False
+        else:
+           return False
+      else:
+         return False
+    else:
+       return False
+
+
+    
     raise NotImplementedError
   
   def Return(self):
     """
     R19. <Return> ::= return ; | return <Expression> ;
     """
+    if self.token_is('keyword', 'return'):
+      if self.token_is('separator', '('):
+        if self.expression():
+          if self.token_is('separator', ')'):
+            if self.token_is('separator', ';'):
+              return True
+            else:
+              return False
+        else:
+          return False
+      else:
+        return False
+    else:
+      return False
     raise NotImplementedError
   
   def Print(self):
     """
     R20. <Print> ::= print ( <Expression>);
     """
+    if self.token_is('keyword', 'print'):
+      if self.token_is('separator', '('):
+        if self.expression():
+          if self.token_is('separator', ')'):
+            if self.token_is('separator', ';'):
+              return True
+            else:
+              return False
+        else:
+          return False
+      else:
+        return False
+    else:
+      return False
     raise NotImplementedError
   
   def scan(self):
