@@ -69,8 +69,9 @@ class RDP:
     R2. <Opt Function Definitions> ::= <Function Definitions> | <Empty>
     """
     print("<Opt Function Definitions> ::= <Function Definitions> | <Empty>")
-    if not self.function_definitions():  # Attempt parsing <Function Definitions>
-      self.empty()  # If it fails, treat as empty
+    if self.function_definitions():
+      return True
+    elif self.empty():
       return True
     return False
   
@@ -79,21 +80,11 @@ class RDP:
     R3. <Function Definitions> ::= <Function> | <Function> <Function Definitions>
     """
     print("<Function Definitions> ::= <Function> | <Function> <Function Definitions>")
-    # Attempt to parse the first function. If successful, enter a loop to try and parse additional functions.
     if self.function():
-        # After parsing one function, attempt to parse additional functions until no more can be parsed.
-        while True:
-            lookahead_token = self.lexer.get_next_token()
-            if lookahead_token and lookahead_token.type == 'keyword' and lookahead_token.value == 'function':
-                if not self.function():
-                    # If there's a failure in parsing the next function, break the loop                    # or you could handle it differently based on your error recovery strategy.
-                    break
-            else:
-                # If the next token doesn't indicate the start of a function, exit the loop.
-                break
+      if self.function_definitions():
         return True
-    else:
-        return False
+      return True
+    return False
 
   def function(self):
       """
@@ -283,16 +274,10 @@ class RDP:
     R13. <Statement List> ::= <Statement> | <Statement> <Statement List>
     """
     if self.statement():
-       return True
-    elif self.statement():
-       if self.statement_list():
-          return True
-       else:
-          return False
-    else:
-       return False
-
-    raise NotImplementedError
+      if self.statement_list():
+        return True
+      return True
+    return False
   
   def statement(self):
     """
@@ -416,20 +401,17 @@ class RDP:
     R19. <Return> ::= return ; | return <Expression> ;
     """
     if self.token_is('keyword', 'return'):
-      if self.token_is('separator', '('):
-        if self.expression():
-          if self.token_is('separator', ')'):
-            if self.token_is('separator', ';'):
-              return True
-            else:
-              return False
+      if self.token_is('separator', ';'):
+        return True
+      elif self.expression():
+        if self.token_is('separator', ';'):
+          return True
         else:
           return False
       else:
         return False
-    else:
-      return False
-    raise NotImplementedError
+    
+    return False
   
   def Print(self):
     """
@@ -449,7 +431,6 @@ class RDP:
         return False
     else:
       return False
-    raise NotImplementedError
   
   def scan(self):
     """
