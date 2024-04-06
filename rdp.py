@@ -2,8 +2,13 @@
 from lexer import Lexer
 
 class RDP:
-  def __init__(self, lexer):
+  def __init__(self, lexer, print_to_console=True, write_to_file=True):
     self.lexer = lexer
+    self.print_to_console = print_to_console
+    self.write_to_file = write_to_file
+    self.print_buffer = []  # Used to print tokens after printing production
+    # Store left-hand side of production until right-hand side is determined
+    self.print_production_buffer = []
     
   def token_is(self, token_type, token_val=None):
     """
@@ -14,18 +19,59 @@ class RDP:
     if next_token is None:
       return False
     if next_token.type == token_type and token_val == None:
+      last_token = self.lexer.get_prev_token()
+      self.print_token(last_token)
+      self.push_to_print_buffer(last_token)
       return True
     elif next_token.type == token_type and token_val == next_token.value:
+      last_token = self.lexer.get_prev_token()
+      self.print_token(last_token)
+      self.push_to_print_buffer(last_token)
       return True
     
     # Backtrack if token type not equal to token_type
     self.lexer.backtrack()
     return False
+  
+  def print_production(self, production, *, to_be_continued=False):
+    """Print and append to file the current production"""
+    if self.print_to_console:
+      if to_be_continued:
+        self.print_production_buffer.append(production)
+      else:
+        print(f"{'':2}{production}")
+        
+  def finish_production_print(self, production):
+    """Print the right hand side of a production that was started but not finished"""
+    left_hand_side = ' '.join(self.print_production_buffer)
+    self.print_production_buffer.clear()
+    print(f"{'':2}{left_hand_side} {production}")
+
+
+  def print_token(self, token):
+    """Print token and append to file a token"""
+    if self.print_to_console:
+      print(f"Token: {token.type:15} Lexeme: {token.value}")
+      
+  def push_to_print_buffer(self, token):
+    """Push token to print buffer to be printed later"""
+    self.print_buffer.append(token)
     
+  def clear_print_buffer(self):
+    """Clear print buffer once all tokens have been printed"""
+    self.print_buffer.clear()
+    
+  def print_token_buffer(self):
+    """Print all tokens in print buffer and clear buffer"""
+    for token in self.print_buffer:
+      self.print_token(token)
+    self.clear_print_buffer()
+          
   def rat24s(self):
       """
       R1. <Rat24S> ::= $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $
       """
+      self.print_production("<Rat24S> --> $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $")
       # Check for the first $ symbol.
       if not self.token_is('separator', '$'):
           print("Error: Expected '$' at the beginning of the program.")
@@ -60,18 +106,17 @@ class RDP:
       if not self.token_is('separator', '$'):
           print("Error: Expected final '$' at the end of the program.")
           return False
-
-      print("Parsing <Rat24S> successful.")
       return True
 
   def opt_function_definitions(self):
     """
     R2. <Opt Function Definitions> ::= <Function Definitions> | <Empty>
     """
-    print("<Opt Function Definitions> ::= <Function Definitions> | <Empty>")
     if self.function_definitions():
+      self.print_production("<Opt Function Definitions> --> <Function Definitions>")
       return True
     elif self.empty():
+      self.print_production("<Opt Function Definitions> --> <Empty>")
       return True
     return False
   
@@ -79,7 +124,6 @@ class RDP:
     """
     R3. <Function Definitions> ::= <Function> | <Function> <Function Definitions>
     """
-    print("<Function Definitions> ::= <Function> | <Function> <Function Definitions>")
     if self.function():
       if self.function_definitions():
         return True
@@ -90,7 +134,6 @@ class RDP:
       """
       R4. <Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>
       """
-      print("<Function> ::= function <Identifier> ( <Opt Parameter List> ) <Opt Declaration List> <Body>")
       if self.token_is('keyword', 'function'):
           # Expecting a single identifier for the function name.
           if self.token_is('identifier'):  # Adjusted from IDs() to expect a single identifier.
@@ -119,7 +162,6 @@ class RDP:
     """
     R5. <Opt Parameter List> ::= <Parameter List> | <Empty>
     """
-    print("<Opt Parameter List> ::= <Parameter List> | <Empty>")
     # Attempt to parse a parameter list. If successful, the parameter_list function will handle its own logging.
     if self.parameter_list():  # If no parameter list found, treat as empty.
         return True
@@ -131,7 +173,6 @@ class RDP:
       """
       R6. <Parameter List> ::= <Parameter> | <Parameter>, <Parameter List>
       """
-      print("<Parameter List> ::= <Parameter> | <Parameter>, <Parameter List>")
       if self.parameter():
           # While loop for handling comma-separated parameter list.
           while True:
@@ -147,7 +188,6 @@ class RDP:
                   # This means we are ready to exit the loop.
                   break
       else:
-          print("Error: Expected a parameter.")
           return False
       return True
   
@@ -155,7 +195,6 @@ class RDP:
     """
     R7. <Parameter> ::= <IDs> <Qualifier>
     """
-    print("<Parameter> ::= <IDs> <Qualifier>")
     if self.IDs() and self.qualifier():
         return True
     return False
@@ -164,8 +203,6 @@ class RDP:
     """
     R8. <Qualifier> ::= integer | boolean | real
     """
-    print("R8. <Qualifier> ::= integer | boolean | real")
-
     if self.token_is('keyword', 'integer'):
       return True
     elif self.token_is('keyword', 'boolean'):
@@ -178,12 +215,9 @@ class RDP:
     """
     R8. <Body> ::= { <Statement List> }
     """
-    print("<Body> ::= { <Statement List> }")
     if self.token_is('separator', '{'):
-        print("Token: Separator          Lexeme: {")
         if self.statement_list():  # Process the statement list.
             if self.token_is('separator', '}'):
-                print("Token: Separator          Lexeme: }")
                 return True
             else:
                 print("Error: Expected '}' at the end of the body.")
@@ -197,7 +231,6 @@ class RDP:
       """
       R9. <Opt Declaration List> ::= <Declaration List> | <Empty>
       """
-      print("<Opt Declaration List> ::= <Declaration List> | <Empty>")
       # Peek at the next token without consuming it.
       lookahead_token = self.lexer.peek_next_token()
       # Ensure lookahead_token is not None before accessing its attributes.
@@ -216,7 +249,6 @@ class RDP:
       """
       R10. <Declaration List> := <Declaration> ; | <Declaration> ; <Declaration List>
       """
-      print("<Declaration List> ::= <Declaration> ; | <Declaration> ; <Declaration List>")
       # Attempt the first declaration.
       if not self.declaration():
           return False
@@ -224,7 +256,6 @@ class RDP:
       # After a successful declaration, expect a semicolon.
       while True:
           if self.token_is('separator', ';'):
-              print("Token: Separator          Lexeme: ;")
               # Attempt to parse another declaration directly.
               if not self.declaration():
                   # If False, we've reached the end of valid declarations or hit an improperly formatted declaration.
@@ -260,13 +291,11 @@ class RDP:
       if self.token_is('identifier'):
           # Successfully parsed an identifier, now look for a comma indicating more identifiers.
           while self.token_is('separator', ','):
-              print("Token: Separator          Lexeme: ,")
               if not self.token_is('identifier'):
                   print("Error: Expected an identifier after ','.")
                   return False
           return True
       else:
-          print("Error: Expected an identifier.")
           return False
 
   def statement_list(self):
@@ -283,10 +312,11 @@ class RDP:
     """
     R14. <Statement> ::= <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
     """
+    self.print_production("<Statement> -->", to_be_continued=True)
     if self.compound():
       return True
     elif self.assign():
-       return True
+      return True
     elif self.If():
        return True
     elif self.Return():
@@ -299,14 +329,13 @@ class RDP:
        return True
     else:
        return False
-    raise NotImplementedError
   
   def compound(self):
     """
     R15. <Compound> ::= { <Statement List> }
     """
-    print("<Compound> ::= { <Statement List> }")
     if self.token_is('separator', '{'):
+        self.finish_production_print("<Compound>")
         if self.statement_list(): 
             if self.token_is('separator', '}'):
                 return True
@@ -316,36 +345,33 @@ class RDP:
             return False
     else:
         return False
-    raise NotImplementedError
   
   def assign(self):
     """
     R16. <Assign> ::= <Identifier> = <Expression> ;
     """
-    print("<Assign> ::= <Identifier> = <Expression> ;")
-    if self.IDs():
-     if self.token_is('operator', '='):
+    if self.token_is('identifier'):
+      self.finish_production_print("<Assign>")
+      self.print_production("<Assign> --> <Identifier> = <Expression> ;")
+      if self.token_is('operator', '='):
         if self.expression():
           if self.token_is('separator', ';'):
-             return True
+            return True
           else:
-             return False
+            return False
         else:
            return False
-     else:
+      else:
         return False
     else:
        return False
-         
-    
-    raise NotImplementedError
-  
+
   def If(self):
     """
     R17. <If> ::= if ( <Condition> ) <Statement> <If_prime>
     """
-    print("<If> ::= if ( <Condition> ) <Statement> <If_prime>")
     if self.token_is('keyword', 'if'):
+      self.finish_production_print("<If>")
       if self.token_is('separator', '('):
         if self.condition():
           if self.token_is('separator', ')'):
@@ -364,15 +390,11 @@ class RDP:
           return False
     else:
           return False
-
-              
-    raise NotImplementedError
   
   def If_prime(self):
     """
     R18. <If_prime> ::= endif | else <Statement> endif
     """
-    print("<If_prime> ::= endif | else <Statement> endif")
     if self.token_is('keyword','endif'):
       return True
     elif self.token_is('keyword','else'):
@@ -391,16 +413,13 @@ class RDP:
          return False
     else:
        return False
-
-
-    
-    raise NotImplementedError
   
   def Return(self):
     """
     R19. <Return> ::= return ; | return <Expression> ;
     """
     if self.token_is('keyword', 'return'):
+      self.finish_production_print("<Return>")
       if self.token_is('separator', ';'):
         return True
       elif self.expression():
@@ -418,6 +437,7 @@ class RDP:
     R20. <Print> ::= print ( <Expression>);
     """
     if self.token_is('keyword', 'print'):
+      self.finish_production_print("<Print>")
       if self.token_is('separator', '('):
         if self.expression():
           if self.token_is('separator', ')'):
@@ -437,6 +457,7 @@ class RDP:
     R21. <Scan> ::= scan ( <IDs> );
     """
     if self.token_is('keyword', 'scan'):
+      self.finish_production_print("<Scan>")
       if self.token_is('separator', '('):
         if self.IDs():
           if self.token_is('separator', ')'):
@@ -456,6 +477,7 @@ class RDP:
     R22. <While> ::= while ( <Condition> ) <Statement> endwhile
     """
     if self.token_is('keyword', 'while'):
+      self.finish_production_print("<While>")
       if self.token_is('separator', '('):
         if self.condition():
           if self.token_is('separator', ')'):
@@ -506,6 +528,7 @@ class RDP:
     """
     R25. <Expression> ::= <Term> <Expression_prime>
     """
+    self.print_production("<Expression> --> <Term> <Expression_prime>")
     if self.term():
       if self.expression_prime():
         return True
@@ -519,6 +542,7 @@ class RDP:
     R26. <Expression_prime> ::= + <Term> <Expression_prime> | - <Term> <Expression_prime> | <Empty>
     """
     if self.token_is('operator', '+'):
+      self.print_production("<Expression_prime> --> + <Term> <Expression_prime>")
       if self.term():
         if self.expression_prime():
           return True
@@ -527,6 +551,7 @@ class RDP:
       else:
         return False
     elif self.token_is('operator', '-'):
+      self.print_production("<Expression_prime> --> - <Term> <Expression_prime>")
       if self.term():
         if self.expression_prime():
           return True
@@ -535,6 +560,7 @@ class RDP:
       else:
         return False
     elif self.empty():
+      self.print_production("<Expression_prime> --> <Empty>")
       return True
     else:
       return False
@@ -543,6 +569,7 @@ class RDP:
     """
     R27. <Term> ::= <Factor> <Term_prime>
     """
+    self.print_production("<Term> --> <Factor> <Term_prime>")
     if self.factor():
       if self.term_prime():
         return True
@@ -553,6 +580,7 @@ class RDP:
     R28. <Term_prime> ::= * <Factor> <Term_prime> | / <Factor> <Term_prime> | <Empty>
     """
     if self.token_is('operator', '*'):
+      self.print_production("<Term_prime> --> * <Factor> <Term_prime>")
       if self.factor():
         if self.term_prime():
           return True
@@ -561,6 +589,7 @@ class RDP:
       else:
         return False
     elif self.token_is('operator', '/'):
+      self.print_production('<Term_prime> --> / <Factor> <Term_prime>')
       if self.factor():
         if self.term_prime():
           return True
@@ -569,6 +598,7 @@ class RDP:
       else:
         return False
     elif self.empty():
+      self.print_production('<Term_prime> --> <Empty>')
       return True
     
     return False
@@ -578,10 +608,13 @@ class RDP:
     R29. <Factor> ::= - <Primary> | <Primary>
     """
     if self.token_is('operator', '-'):
+      self.print_production('<Factor> --> - <Primary>')
       if self.primary():
         return True
-    elif self.primary():
-      return True
+    else:
+      self.print_production('<Factor> --> <Primary>')
+      if self.primary():
+        return True
     
     return False
   
@@ -592,6 +625,7 @@ class RDP:
     """
     if self.token_is('identifier'):
       if self.token_is('separator', '('):
+        self.print_production('<Primary> --> <Identifier> ( <IDs> )')
         if self.IDs():
           if self.token_is('separator', ')'):
             return True
@@ -600,10 +634,13 @@ class RDP:
         else:
           return False
       else:      
+        self.print_production('<Primary> --> <Identifier>')
         return True
     elif self.token_is('integer'):
+      self.print_production('<Primary> --> <Integer>')
       return True
     elif self.token_is('separator', '('):
+      self.print_production('<Primary> --> ( <Expression> )')
       if self.expression():
         if self.token_is('separator', ')'):
           return True
@@ -612,10 +649,13 @@ class RDP:
       else:
         return False
     elif self.token_is('real'):
+      self.print_production('<Primary> --> <Real>')
       return True
     elif self.token_is('keyword', 'true'):
+      self.print_production('<Primary> --> true')
       return True
     elif self.token_is('keyword', 'false'):
+      self.print_production('<Primary> --> false')
       return True
     
     return False

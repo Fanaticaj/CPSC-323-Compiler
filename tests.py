@@ -570,6 +570,12 @@ class TestRDP(unittest.TestCase):
         is_empty = parser.empty()
         self.assertTrue(is_empty, f"Not recognized as Empty: {empty}")
         self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {empty}")
+        
+    def test_output(self):
+        source = "a = b + c;"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.statement()
 
 if __name__ == "__main__":
     unittest.main()
