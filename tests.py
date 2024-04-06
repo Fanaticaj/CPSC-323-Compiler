@@ -360,7 +360,7 @@ class TestRDP(unittest.TestCase):
         """
         R17. <If> ::= if ( <Condition> ) <Statement> <If_prime>
         """
-        if_statement = 'if ( <Condition> ) <Statement> <If_prime>'
+        if_statement = 'if ( 3 < 1 ) { scan (myvar); } endif'
         l = Lexer(if_statement)
         parser = RDP(l)
         is_If = parser.If()
