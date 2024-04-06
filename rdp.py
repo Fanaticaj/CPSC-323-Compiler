@@ -282,22 +282,15 @@ class RDP:
     """
     R13. <Statement List> ::= <Statement> | <Statement> <Statement List>
     """
-    print("<Statement List> ::= <Statement> | <Statement> <Statement List>")
-    # Attempt to parse the first function. If successful, enter a loop to try and parse additional functions.
     if self.statement():
-        # After parsing one function, attempt to parse additional functions until no more can be parsed.
-        while True:
-            lookahead_token = self.lexer.get_next_token()
-            if lookahead_token and lookahead_token.type == 'keyword' and lookahead_token.value == 'statement':
-                if not self.statement():
-                    # If there's a failure in parsing the next function, break the loop                    # or you could handle it differently based on your error recovery strategy.
-                    break
-            else:
-                # If the next token doesn't indicate the start of a function, exit the loop.
-                break
-        return True
+       return True
+    elif self.statement():
+       if self.statement_list():
+          return True
+       else:
+          return False
     else:
-        return False
+       return False
 
     raise NotImplementedError
   
@@ -329,7 +322,7 @@ class RDP:
     """
     print("<Compound> ::= { <Statement List> }")
     if self.token_is('separator', '{'):
-        if self.statement_list():  # Process the statement list.
+        if self.statement_list(): 
             if self.token_is('separator', '}'):
                 return True
             else:
@@ -346,18 +339,19 @@ class RDP:
     """
     print("<Assign> ::= <Identifier> = <Expression> ;")
     if self.IDs():
-          if self.token_is('operator', '='):
-        # Proceed to parse the IDs.
-            if self.expression():
-              if not self.token_is('separator',';'):
-                print("Error: Expected identifier list after type keyword.")
-                return False
-
-        # If we successfully parse the IDs after the type keyword, the declaration is successful.
-          return True
-    else:
-        # If the next token is not a type keyword, it's not a declaration.
+     if self.token_is('operator', '='):
+        if self.expression():
+          if self.token_is('separator', ';'):
+             return True
+          else:
+             return False
+        else:
+           return False
+     else:
         return False
+    else:
+       return False
+         
     
     raise NotImplementedError
   
