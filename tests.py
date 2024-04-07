@@ -1,5 +1,6 @@
 import unittest
 
+from compiler import main
 from lexer import Lexer
 from parse_token import Token
 from rdp import RDP
@@ -572,10 +573,40 @@ class TestRDP(unittest.TestCase):
         self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {empty}")
         
     def test_output(self):
-        source = "a = b + c;"
-        l = Lexer(source)
-        parser = RDP(l, print_to_console=True)
-        parser.statement()
+        """Run compiler with print_true.source program and check productions output"""
+        exprected_res = [
+            'Token: separator       Lexeme: $',
+            '  <Rat24S> --> $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $',
+            '  <Opt Function Definitions> --> <Empty>',
+            'Token: separator       Lexeme: $',
+            '  <Opt Declaration List> --> <Empty>',
+            'Token: separator       Lexeme: $',
+            '  <Statement List> --> <Statement>',
+            'Token: keyword         Lexeme: print',
+            '  <Statement> --> <Print>',
+            '  <Print> --> print ( <Expression>);',
+            'Token: separator       Lexeme: (',
+            '  <Expression> --> <Term> <Expression_prime>',
+            '  <Term> --> <Factor> <Term_prime>',
+            '  <Factor> --> <Primary>',
+            'Token: keyword         Lexeme: true',
+            '  <Primary> --> true',
+            '  <Term_prime> --> <Empty>',
+            '  <Expression_prime> --> <Empty>',
+            'Token: separator       Lexeme: )',
+            'Token: separator       Lexeme: ;',
+            'Token: separator       Lexeme: $'
+            ]
+        
+        # Save productions to temp_out file
+        filepath = "RAT24S_programs/print_true.source"
+        temp_out = "test_out.txt"
+        main(filepath, False, None, False, temp_out)
+        
+        # Open temp_out file
+        with open(temp_out) as txt:
+            res = txt.read().strip().split('\n')
+        self.assertEqual(res, exprected_res)
 
 if __name__ == "__main__":
     unittest.main()
