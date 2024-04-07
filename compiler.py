@@ -30,6 +30,11 @@ def main(path, print_tokens, tokens_filename, print_prods, out_filename):
     else:
         print("Invalid RAT24S program")
         
+    # Let user know how to save productions if no args passed
+    if not print_tokens and not tokens_filename and not print_prods and not out_filename:
+        print("Note: Use --print-productions to print productions to console")
+        print("Use --save-productions=filename to save productions to a file")
+        
 if __name__ == "__main__":
     args = utils.parse_arguments()
     main(*args)
