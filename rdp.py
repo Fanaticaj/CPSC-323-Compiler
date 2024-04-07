@@ -216,7 +216,11 @@ class RDP:
     curr = self.lexer.curr_token
     # Read first function
     self.parameter()
-    is_recursive = self.parameter()
+    next_tok = self.lexer.peek_next_token()
+    if next_tok and next_tok.value == ',':
+      is_recursive = True
+    else:
+      is_recursive = False
     self.print_to_console = temp_print_to_console
     self.lexer.curr_token = curr
     return is_recursive
@@ -225,23 +229,25 @@ class RDP:
       """
       R6. <Parameter List> ::= <Parameter> | <Parameter>, <Parameter List>
       """
-      self.print_production("<Parameter List> --> <Parameter> | <Parameter>, <Parameter List>")
-      if self.parameter():
-          # While loop for handling comma-separated parameter list.
-          while True:
-              # Utilize token_is for checking the comma separator.
-              if self.token_is('separator', ','):
-                  if not self.parameter():
-                      self.print_production("Error: Expected a parameter after ','.")
-                      return False
-              else:
-                  # If token_is returned False, it means the next token is not a comma,
-                  # and the lexer's position has been reset by backtrack in token_is.
-                  # This means we are ready to exit the loop.
-                  break
-      else:
+      is_recursive = self.is_parameter_list_recursive()
+      
+      if is_recursive:
+        self.print_production("<Parameter List> --> <Parameter>, <Parameter List>")
+        if self.parameter():
+          if self.token_is('separator', ','):
+            if self.parameter_list():
+              return True
+            else:
+              return False
+          else:
+            return False
+        else:
           return False
-      return True
+      else:
+        self.print_production("<Parameter List> --> <Parameter>")
+        if self.parameter():
+          return True
+        return False
   
   def parameter(self):
     """
