@@ -13,7 +13,7 @@ def parse_arguments():
     arg_parser = argparse.ArgumentParser()
 
     # Path to source code file arg
-    arg_parser.add_argument('source_code', metavar='SourceCodeFilePath', type=str,
+    arg_parser.add_argument('source_code', metavar='source file', type=str,
                     help="Path to the source code file that will be compiled")
 
     # Arg to print tokens only
