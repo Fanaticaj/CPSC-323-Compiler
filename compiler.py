@@ -1,25 +1,12 @@
 import argparse
-import os
 from pathlib import Path
 
+import utils
 from lexer import Lexer
 from rdp import RDP
 
-# If user does not input source file, defaultSourceFile will be used instead
-tokenOutputExt = '_tokens.txt' # Append tokenOutputExt to token files when saving tokens
-
-def print_source_code(sourceCode):
-    """Print the source code used by the compiler"""
-    print('='*32, " Source Code ", '='*33)
-    print(sourceCode)
-    print('='*80, '\n')
-
-def print_formatted_tokens(tokens, l):
-    """Print tokens in same format as source code"""
-    token_count = len([token for token in tokens if token.type != 'invalid'])
-    print('='*32, f" Tokens ({token_count}) ", '='*33)
-    l.print_tokens()
-    print('='*80)
+# Append tokenOutputExt to token files when saving tokens
+tokenOutputExt = '_tokens.txt'
 
 def main():
     arg_parser = argparse.ArgumentParser()
@@ -78,11 +65,11 @@ def main():
 
     # Print unmodified source code
     if print_all:
-        print_source_code(sourceCode)
+        utils.print_source_code(sourceCode)
 
     # Print tokens returned by lexer
     if print_all or print_tokens:
-        print_formatted_tokens(tokens, lexical_analyzer)
+        utils.print_formatted_tokens(tokens, lexical_analyzer)
 
     rdp_parser = RDP(lexical_analyzer, print_to_console=print_prods, out_filename=out_filename)
     is_valid_program = rdp_parser.rat24s()
