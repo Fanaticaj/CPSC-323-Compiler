@@ -79,39 +79,39 @@ class RDP:
       """
       # Check for the first $ symbol.
       if not self.token_is('separator', '$'):
-          print("Error: Expected '$' at the beginning of the program.")
+          self.print_production("Error: Expected '$' at the beginning of the program.")
           return False
       else:
         self.print_production("<Rat24S> --> $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $")
         
       # Optionally parse function definitions.
       if not self.opt_function_definitions():
-          print("Error: Issue parsing optional function definitions.")
+          self.print_production("Error: Issue parsing optional function definitions.")
           return False
 
       # Check for the $ symbol after optional function definitions.
       if not self.token_is('separator', '$'):
-          print("Error: Expected '$' after optional function definitions.")
+          self.print_production("Error: Expected '$' after optional function definitions.")
           return False
 
       # Optionally parse declaration list.
       if not self.opt_declaration_list():
-          print("Error: Issue parsing optional declaration list.")
+          self.print_production("Error: Issue parsing optional declaration list.")
           return False
 
       # Check for the $ symbol after optional declaration list.
       if not self.token_is('separator', '$'):
-          print("Error: Expected '$' after optional declaration list.")
+          self.print_production("Error: Expected '$' after optional declaration list.")
           return False
 
       # Parse statement list.
       if not self.statement_list():
-          print("Error: Issue parsing statement list.")
+          self.print_production("Error: Issue parsing statement list.")
           return False
 
       # Check for the final $ symbol indicating the end of the program.
       if not self.token_is('separator', '$'):
-          print("Error: Expected final '$' at the end of the program.")
+          self.print_production("Error: Expected final '$' at the end of the program.")
           return False
       return True
 
@@ -130,16 +130,38 @@ class RDP:
       return True
     return False
   
+  def is_function_definitions_recursive(self):
+    """Return True if function definitions includes more than one function, False otherwise"""
+    temp_print_to_console = self.print_to_console
+    self.print_to_console = False
+    curr = self.lexer.curr_token
+    # Read first function
+    self.function()
+    is_recursive = self.function()
+    self.print_to_console = temp_print_to_console
+    self.lexer.curr_token = curr
+    return is_recursive
+  
   def function_definitions(self):
     """
     R3. <Function Definitions> ::= <Function> | <Function> <Function Definitions>
     """
-    self.print_production("<Function Definitions> --> <Function> | <Function> <Function Definitions>")
-    if self.function():
-      if self.function_definitions():
+    #self.print_production("<Function Definitions> --> <Function> | <Function> <Function Definitions>")
+    is_recursive = self.is_function_definitions_recursive()
+    # Check function and function definitions if program contains more than one function
+    if is_recursive:
+      self.print_production("<Function Definitions> --> <Function> <Function Definitions>")
+      if self.function():
+        if self.function_definitions():
+          return True
         return True
-      return True
-    return False
+      return False
+    else:  # Check only function if program contains only one function
+      self.print_production("<Function Definitions> --> <Function>")
+      if self.function():
+        return True
+      else:
+        return False
 
   def function(self):
       """
@@ -155,17 +177,17 @@ class RDP:
                               if self.body():  # Parse the function body.
                                   return True
                               else:
-                                  print("Error: Invalid function body.")
+                                  self.print_production("Error: Invalid function body.")
                           else:
-                              print("Error: Issue within optional declaration list.")
+                              self.print_production("Error: Issue within optional declaration list.")
                       else:
-                          print("Error: Expected ')' after parameters.")
+                          self.print_production("Error: Expected ')' after parameters.")
                   else:
-                      print("Error: Issue within optional parameter list.")
+                      self.print_production("Error: Issue within optional parameter list.")
               else:
-                  print("Error: Expected '(' after function name.")
+                  self.print_production("Error: Expected '(' after function name.")
           else:
-              print("Error: Expected identifier after 'function' keyword.")
+              self.print_production("Error: Expected identifier after 'function' keyword.")
       return False
 
   
@@ -187,6 +209,18 @@ class RDP:
     self.print_production("<Opt Parameter List> --> <Empty>")
     return True
   
+  def is_parameter_list_recursive(self):
+    """Return True if <Parameter occurs more than once, False otherwise"""
+    temp_print_to_console = self.print_to_console
+    self.print_to_console = False
+    curr = self.lexer.curr_token
+    # Read first function
+    self.parameter()
+    is_recursive = self.parameter()
+    self.print_to_console = temp_print_to_console
+    self.lexer.curr_token = curr
+    return is_recursive
+  
   def parameter_list(self):
       """
       R6. <Parameter List> ::= <Parameter> | <Parameter>, <Parameter List>
@@ -198,7 +232,7 @@ class RDP:
               # Utilize token_is for checking the comma separator.
               if self.token_is('separator', ','):
                   if not self.parameter():
-                      print("Error: Expected a parameter after ','.")
+                      self.print_production("Error: Expected a parameter after ','.")
                       return False
               else:
                   # If token_is returned False, it means the next token is not a comma,
@@ -243,11 +277,11 @@ class RDP:
         if self.token_is('separator', '}'):
           return True
         else:
-          print("Error: Expected '}' at the end of the body.")
+          self.print_production("Error: Expected '}' at the end of the body.")
       else:
-        print("Error: Invalid statement list inside body.")
+        self.print_production("Error: Invalid statement list inside body.")
     else:
-        print("Error: Expected '{' at the beginning of the body.")
+        self.print_production("Error: Expected '{' at the beginning of the body.")
     return False
   
   def opt_declaration_list(self):
@@ -325,7 +359,7 @@ class RDP:
           # Successfully parsed an identifier, now look for a comma indicating more identifiers.
           while self.token_is('separator', ','):
               if not self.token_is('identifier'):
-                  print("Error: Expected an identifier after ','.")
+                  self.print_production("Error: Expected an identifier after ','.")
                   return False
           return True
       else:

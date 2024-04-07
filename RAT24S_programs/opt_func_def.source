@@ -1,0 +1,1 @@
+$ function myvar () { print (true); } function hello_world () { print (false); } $ $ print (true); $
