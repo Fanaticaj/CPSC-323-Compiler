@@ -22,8 +22,8 @@ def main():
     arg_parser.add_argument('-t', '--print-tokens', action='store_true',
                     default=False, help="print tokens returned by lexer")
     # Arg to specify output file (optional)
-    arg_parser.add_argument('-o', '--output', action='store', default=None,
-                    help="Specify output file")
+    arg_parser.add_argument('--save-tokens', action='store', default=None,
+                    help="Specify output file for tokens")
     # Arg to print proudctions to console
     arg_parser.add_argument('--print-productions', action='store_true',
                             default=False, help='Print productions to console')
@@ -35,7 +35,7 @@ def main():
     path = Path(arg_parser.parse_args().source_code)
     print_all = arg_parser.parse_args().print_all
     print_tokens = arg_parser.parse_args().print_tokens
-    output_arg = arg_parser.parse_args().output
+    tokens_filename = arg_parser.parse_args().save_tokens
     print_prods = arg_parser.parse_args().print_productions
     out_filename = arg_parser.parse_args().save_productions
 
@@ -45,15 +45,9 @@ def main():
 
     # Parse tokens using lexer
     lexical_analyzer = Lexer(sourceCode)
-    tokens = lexical_analyzer.tokenize()
 
-    # Save tokens to txt file
-    if output_arg:
-        output_path = output_arg
-    else:
-        output_file = f"{path.stem}{tokenOutputExt}"
-        output_path = f"{path.cwd()}/{output_file}"
-    lexical_analyzer.save_tokens(output_path)
+    if tokens_filename:
+        lexical_analyzer.save_tokens(tokens_filename)
 
     # Print unmodified source code
     if print_all:
