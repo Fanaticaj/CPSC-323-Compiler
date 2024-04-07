@@ -110,6 +110,8 @@ class Lexer:
         Each token should be printed like this: <token_type='token_value'>
         For example: <integer='123'>
         """
+        valid_token_count = len([token for token in self.tokens if token.type != 'illegal'])
+        
         lines = self.sourceCode.split('\n')
         token_count_per_line = []
         for line in lines:
@@ -120,6 +122,7 @@ class Lexer:
             if potentialTokens:
                 token_count_per_line.append(len(potentialTokens))
         current_token = 0
+        print('='*32, f" Tokens ({valid_token_count}) ", '='*33)
         for token_count in token_count_per_line:
             for i in range(token_count):
                 curr_token = self.tokens[current_token]
@@ -127,6 +130,18 @@ class Lexer:
                 print(formatted_str, end=" ")
                 current_token += 1
             print()
+        print('='*80)
+            
+    def save_tokens(self, filename):
+        """Save tokens to a file"""
+        # Clear output file if already exists and write headers
+        with open(filename, 'w') as tokens_txt:
+            tokens_txt.write(f"{'Token':15}Lexeme\n\n")
+
+        # Append each token to output file
+        with open(filename, 'a') as tokens_txt:
+            for token in self.tokens:
+                tokens_txt.write(f"{token.type:15}{token.value}\n")
 
     def get_next_token(self):
         """

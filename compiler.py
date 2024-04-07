@@ -53,15 +53,7 @@ def main():
     else:
         output_file = f"{path.stem}{tokenOutputExt}"
         output_path = f"{path.cwd()}/{output_file}"
-
-    # Clear output file if already exists and write headers
-    with open(output_path, 'w') as tokens_txt:
-        tokens_txt.write(f"{'Token':15}Lexeme\n\n")
-
-    # Append each token to output file
-    with open(output_path, 'a') as tokens_txt:
-        for token in tokens:
-            tokens_txt.write(f"{token.type:15}{token.value}\n")
+    lexical_analyzer.save_tokens(output_path)
 
     # Print unmodified source code
     if print_all:
@@ -69,7 +61,7 @@ def main():
 
     # Print tokens returned by lexer
     if print_all or print_tokens:
-        utils.print_formatted_tokens(tokens, lexical_analyzer)
+        lexical_analyzer.print_tokens()
 
     rdp_parser = RDP(lexical_analyzer, print_to_console=print_prods, out_filename=out_filename)
     is_valid_program = rdp_parser.rat24s()
