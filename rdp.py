@@ -394,17 +394,37 @@ class RDP:
           return True
         else:
           return False
+        
+  def is_statement_list_recursive(self):
+    """Return True if statement occurs more than once, false otherwise"""
+    temp_print_to_console = self.print_to_console
+    self.print_to_console = False
+    curr = self.lexer.curr_token
+    self.statement()
+    is_recursive = self.statement()
+    self.print_to_console = temp_print_to_console
+    self.lexer.curr_token = curr
+    return is_recursive
 
   def statement_list(self):
     """
     R13. <Statement List> ::= <Statement> | <Statement> <Statement List>
     """
-    self.print_production("<Statement List> --> <Statement> | <Statement> <Statement List>")
-    if self.statement():
-      if self.statement_list():
+    is_recursive = self.is_statement_list_recursive()
+    if is_recursive:
+      self.print_production("<Statement List> --> <Statement> <Statement List>")
+      if self.statement():
+        if self.statement_list():
+          return True
         return True
-      return True
-    return False
+      return False
+    else:
+      self.print_production("<Statement List> --> <Statement>")
+      if self.statement():
+        return True
+      return False
+
+
   
   def statement(self):
     """
