@@ -40,7 +40,7 @@ class RDP:
     prod = f"{'':2}{production}"
     if to_be_continued:
       self.print_production_buffer.append(prod)
-    if self.print_to_console:
+    elif self.print_to_console:
       print(prod)
         
     if self.out_filename:
@@ -133,12 +133,15 @@ class RDP:
   def is_function_definitions_recursive(self):
     """Return True if function definitions includes more than one function, False otherwise"""
     temp_print_to_console = self.print_to_console
+    temp_filename = self.out_filename
+    self.out_filename = None
     self.print_to_console = False
     curr = self.lexer.curr_token
     # Read first function
     self.function()
     is_recursive = self.function()
     self.print_to_console = temp_print_to_console
+    self.out_filename = temp_filename
     self.lexer.curr_token = curr
     return is_recursive
   
@@ -212,6 +215,8 @@ class RDP:
   def is_parameter_list_recursive(self):
     """Return True if <Parameter occurs more than once, False otherwise"""
     temp_print_to_console = self.print_to_console
+    temp_filename = self.out_filename
+    self.out_filename = None
     self.print_to_console = False
     curr = self.lexer.curr_token
     # Read first function
@@ -222,6 +227,7 @@ class RDP:
     else:
       is_recursive = False
     self.print_to_console = temp_print_to_console
+    self.out_filename = temp_filename
     self.lexer.curr_token = curr
     return is_recursive
   
@@ -358,6 +364,8 @@ class RDP:
   def is_IDs_recursive(self):
     """Return True if there is more than one IDs, False otherwise"""
     temp_print_to_console = self.print_to_console
+    temp_filename = self.out_filename
+    self.out_filename = None
     self.print_to_console = False
     curr = self.lexer.curr_token
     self.token_is('identifier')
@@ -367,6 +375,7 @@ class RDP:
     else:
       is_recursive = False
     self.print_to_console = temp_print_to_console
+    self.out_filename = temp_filename
     self.lexer.curr_token = curr
     return is_recursive
 
@@ -398,11 +407,14 @@ class RDP:
   def is_statement_list_recursive(self):
     """Return True if statement occurs more than once, false otherwise"""
     temp_print_to_console = self.print_to_console
+    temp_filename = self.out_filename
+    self.out_filename = None
     self.print_to_console = False
     curr = self.lexer.curr_token
-    self.statement()
-    is_recursive = self.statement()
+    self.statement(IGNORE_PRINT=True)
+    is_recursive = self.statement(IGNORE_PRINT=True)
     self.print_to_console = temp_print_to_console
+    self.out_filename = temp_filename
     self.lexer.curr_token = curr
     return is_recursive
 
@@ -426,11 +438,12 @@ class RDP:
 
 
   
-  def statement(self):
+  def statement(self, *, IGNORE_PRINT=False):
     """
     R14. <Statement> ::= <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
     """
-    self.print_production("<Statement> -->", to_be_continued=True)
+    if not IGNORE_PRINT:
+      self.print_production("<Statement> -->", to_be_continued=True)
     if self.compound():
       return True
     elif self.assign():
