@@ -354,21 +354,45 @@ class RDP:
         return True
       return False
     return False
+  
+  def is_IDs_recursive(self):
+    """Return True if there is more than one IDs, False otherwise"""
+    temp_print_to_console = self.print_to_console
+    self.print_to_console = False
+    curr = self.lexer.curr_token
+    self.token_is('identifier')
+    next_token = self.lexer.peek_next_token()
+    if next_token and next_token.value == ',':
+      is_recursive = True
+    else:
+      is_recursive = False
+    self.print_to_console = temp_print_to_console
+    self.lexer.curr_token = curr
+    return is_recursive
 
   def IDs(self):
       """
       R12. <IDs> ::= <Identifier> | <Identifier>, <IDs>
       """
-      self.print_production("<IDs> --> <Identifier> | <Identifier>, <IDs>")
-      # Attempt to parse the first identifier.
-      if self.token_is('identifier'):
-          # Successfully parsed an identifier, now look for a comma indicating more identifiers.
-          while self.token_is('separator', ','):
-              if not self.token_is('identifier'):
-                  self.print_production("Error: Expected an identifier after ','.")
-                  return False
-          return True
+      is_recursive = self.is_IDs_recursive()
+      
+      if is_recursive:
+        self.print_production("<IDs> --> <Identifier>, <IDs>")
+        if self.token_is('identifier'):
+          if self.token_is('separator', ','):
+            if self.IDs():
+              return True
+            else:
+              return False
+          else:
+            return False
+        else:
+          return False
       else:
+        self.print_production("<IDs> --> <Identifier>")
+        if self.token_is('identifier'):
+          return True
+        else:
           return False
 
   def statement_list(self):
