@@ -6,7 +6,6 @@ from lexer import Lexer
 from rdp import RDP
 
 # If user does not input source file, defaultSourceFile will be used instead
-defaultSourceFile = './RAT24S_programs/RAT24S.source'
 tokenOutputExt = '_tokens.txt' # Append tokenOutputExt to token files when saving tokens
 
 def print_source_code(sourceCode):
@@ -27,7 +26,6 @@ def main():
 
     # Path to source code file arg
     arg_parser.add_argument('source_code', metavar='SourceCodeFilePath', type=str,
-                    nargs='?', default=defaultSourceFile,
                     help="Path to the source code file that will be compiled")
 
     # Arg to print source code and tokens
