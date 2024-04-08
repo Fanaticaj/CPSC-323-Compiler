@@ -533,19 +533,13 @@ class RDP:
       return True
     elif self.token_is('keyword','else'):
       self.print_production("<If_prime> --> else <Statement> endif")
-      if self.token_is('separator','{'):
-        if self.statement():
-           if self.token_is('separator','}'):
-              if self.token_is('keyword','endif'):
-                 return True
-              else:
-                return False
-           else:
-              return False
-        else:
-           return False
+      if self.statement():
+          if self.token_is('keyword','endif'):
+              return True
+          else:
+            return False
       else:
-         return False
+          return False
     else:
        return False
   
