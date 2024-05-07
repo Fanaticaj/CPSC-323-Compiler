@@ -595,15 +595,8 @@ class RDP:
           if self.token_is('separator', ')'):
             if self.token_is('separator', ';'):
               return True
-            else:
-              return False
-        else:
-          return False
-      else:
-        return False
-    else:
-      return False
-      
+    return False
+ 
   def While(self):
     """
     R22. <While> ::= while ( <Condition> ) <Statement> endwhile
@@ -617,53 +610,42 @@ class RDP:
             if self.statement():
               if self.token_is('keyword', 'endwhile'):
                 return True
-              else:
-                return False
-            else:
-              return False
-          else:
-            return False
-        else:
-          return False
-      else:
-        return False
-    else:
-      return False
-      
+    return False
+
   def condition(self):
     """
     R23. <Condition> ::= <Expression> <Relop> <Expression>
     """
+    # FIRST set for <Expression>
     FIRST = set(['-', '(', 'true', 'false'])
     FIRST_TYPES = set(['identifier', 'integer', 'real'])
     next_token = self.lexer.peek_next_token()
+    # Check if next token type and value are in FIRST  sets
+    # Print production rule if True
     if next_token:
       if next_token.type in FIRST_TYPES or next_token.value in FIRST:
         self.print_production("<Condition> --> <Expression> <Relop> <Expression>")
+
+    # Parse tokens
     if self.expression():
       if self.relop():
         if self.expression():
           return True
-        else:
-          return False
-      else:
-        return False
-    else:
-      return False
+    return False
   
   def relop(self):
     """
     R24. <Relop> ::= == | != | > | < | <= | =>
     """
     operators = set(['==', '!=', '>', '<', '<=', '=>'])
-    next_token = self.lexer.tokens[self.lexer.curr_token]
+    next_token = self.lexer.peek_next_token()
     if self.token_is('operator') and next_token.value in operators:
       self.print_production(f"<Relop> --> {next_token.value}")
       return True
     else:
       self.lexer.backtrack()
       return False
-  
+
   def expression(self):
     """
     R25. <Expression> ::= <Term> <Expression_prime>
@@ -672,11 +654,8 @@ class RDP:
     if self.term():
       if self.expression_prime():
         return True
-      else:
-        return False
-    else:
-      return False
-  
+    return False
+
   def expression_prime(self):
     """
     R26. <Expression_prime> ::= + <Term> <Expression_prime> | - <Term> <Expression_prime> | <Empty>
@@ -686,24 +665,17 @@ class RDP:
       if self.term():
         if self.expression_prime():
           return True
-        else:
-          return False
-      else:
-        return False
+      return False
     elif self.token_is('operator', '-'):
       self.print_production("<Expression_prime> --> - <Term> <Expression_prime>")
       if self.term():
         if self.expression_prime():
           return True
-        else:
-          return False
-      else:
-        return False
+      return False
     elif self.empty():
       self.print_production("<Expression_prime> --> <Empty>")
       return True
-    else:
-      return False
+    return False
   
   def term(self):
     """
@@ -724,23 +696,16 @@ class RDP:
       if self.factor():
         if self.term_prime():
           return True
-        else:
-          return False
-      else:
-        return False
+      return False
     elif self.token_is('operator', '/'):
       self.print_production('<Term_prime> --> / <Factor> <Term_prime>')
       if self.factor():
         if self.term_prime():
           return True
-        else:
-          return False
-      else:
-        return False
+      return False
     elif self.empty():
       self.print_production('<Term_prime> --> <Empty>')
       return True
-    
     return False
   
   def factor(self):
@@ -755,7 +720,6 @@ class RDP:
       self.print_production('<Factor> --> <Primary>')
       if self.primary():
         return True
-    
     return False
   
   def primary(self):
@@ -769,10 +733,7 @@ class RDP:
         if self.IDs():
           if self.token_is('separator', ')'):
             return True
-          else:
-            return False
-        else:
-          return False
+        return False
       else:      
         self.print_production('<Primary> --> <Identifier>')
         return True
@@ -784,10 +745,7 @@ class RDP:
       if self.expression():
         if self.token_is('separator', ')'):
           return True
-        else:
-          return False
-      else:
-        return False
+      return False
     elif self.token_is('real'):
       self.print_production('<Primary> --> <Real>')
       return True
@@ -797,11 +755,11 @@ class RDP:
     elif self.token_is('keyword', 'false'):
       self.print_production('<Primary> --> false')
       return True
-    
     return False
   
   def empty(self):
     """
     R31. <Empty> ::= None
     """
+    # Empty alwasys returns True
     return True
