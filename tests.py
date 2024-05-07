@@ -5,6 +5,40 @@ from lexer import Lexer
 from parse_token import Token
 from rdp import RDP
 
+class TestToken(unittest.TestCase):
+    """Test Token class"""
+    def test_valid_types(self):
+        """Test that all valid types create Token"""
+        valid_types = ['identifier', 'illegal', 'integer', 'keyword',
+                        'operator', 'real', 'separator']
+        # Create token with each type of valid type
+        # Test will fail if there is an error raise by Token class
+        for t in valid_types:
+            tok = Token(t, 'random val')
+
+    def test_invalid_type(self):
+        """
+        Test that Token class will raise error if user tries to create
+        an invalid token type
+        """
+        invalid_type = "fake_type"
+        raised_err = False
+        try:
+            tok = Token(invalid_type, 'random val')
+        except ValueError:
+            # ValueError was raised, test passed
+            raised_err = True
+        self.assertTrue(raised_err, "Token class did not raise error when user created token with invalid type.")
+
+    def test_uppercase_to_lowercase(self):
+        """
+        Test that Token class will convert upper case characters to lowercase
+        """
+        upper_val = "MyVarIsUPPER"
+        lower_val = "myvarisupper"
+        tok = Token('identifier', upper_val)
+        self.assertEqual(tok.value, lower_val)
+
 class TestLexer(unittest.TestCase):
     """Test that lexer works"""
 

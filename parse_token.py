@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class Token:
     """Class for representing tokens"""
     type: str
@@ -13,4 +13,4 @@ class Token:
             raise ValueError(f"Token type {self.type} is not a valid type.")
 
         # Call lower() on token value to ensure that all tokens are lowercase
-        self.value = self.value.lower()
+        object.__setattr__(self, 'value', self.value.lower())
