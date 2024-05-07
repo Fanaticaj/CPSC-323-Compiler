@@ -4,6 +4,7 @@ from compiler import main
 from lexer import Lexer
 from parse_token import Token
 from rdp import RDP
+from sym_table import Symbol, SymbolTable
 
 class TestToken(unittest.TestCase):
     """Test Token class"""
@@ -641,6 +642,42 @@ class TestRDP(unittest.TestCase):
         with open(temp_out) as txt:
             res = txt.read().strip().split('\n')
         self.assertEqual(res, exprected_res)
+
+class TestSymbolTable(unittest.TestCase):
+    """Test Symbol table methods"""
+    def test_initial_mem_address(self):
+        """Test that memory address starts at 1"""
+        init_mem_address = 1
+        symbol_table = SymbolTable()
+        self.assertEqual(symbol_table.mem_address, init_mem_address)
+
+    def test_insert_symbol(self):
+        """Test inserting a symbol to the symbol table"""
+        # Identifier token
+        id_tok = Token('identifier', 'count')
+        # Value Token
+        int_tok = Token('integer', '1')
+
+        # Insert symbol to table
+        symbol_table = SymbolTable()
+        symbol_table.insert(id_tok, int_tok)
+
+        # Assett symbol as added to symbol table
+        expected_symbol_table = {
+            Token(type='identifier', value='count'): Symbol(mem_address=1, token=Token(type='integer', value='1'))
+            }
+        self.assertEqual(symbol_table.symbols, expected_symbol_table)
+
+        # Assert memory address was increased
+        expected_mem_address = 2
+        self.assertEqual(symbol_table.mem_address, expected_mem_address)
+
+    def test_update_symbol(self):
+        """
+        Test that inserting an existing symbol will only update the value and 
+        not increase the memory address
+        """
+        raise NotImplementedError
 
 if __name__ == "__main__":
     unittest.main()
