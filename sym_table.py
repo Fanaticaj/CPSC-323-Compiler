@@ -60,12 +60,15 @@ class SymbolTable:
         # Insert updated symbol to dictionary
         self.symbols[new_symbol] = mem_address
 
-  def write(self, filename):
+  def write(self, filename, *, append_to_file=False):
     """
     Prints/writes the symbol table to a file
     """
     # Write headers to file
-    with open(filename, 'w') as out_file:
+    write_mode = 'w'
+    if append_to_file:
+      write_mode = 'a'
+    with open(filename, write_mode) as out_file:
       out_file.write(f"{'Identifier':20}")
       out_file.write(f"{'Memory Location':20}")
       out_file.write("Type")
