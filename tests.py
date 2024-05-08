@@ -660,7 +660,28 @@ class TestRDP(unittest.TestCase):
         expected_symbols = {
             Symbol(name='count', type='integer') : 1
             }
-        self.assertEqual(parser.symbol_table.symbols, expected_symbols)
+        self.assertEqual(parser.symbol_table.symbols, expected_symbols,
+                         "Did not insert integer identifier to symbol table")
+    
+    def test_insert_boolean_symbol(self):
+        """
+        Test that RDP parser correctly inserts boolean identifiers
+        """
+        # Boolean delcaration source code
+        source = "boolean is_cold"
+        l = Lexer(source)
+        parser = RDP(l)
+
+        # Run declaration method
+        parser.declaration()
+
+        # Assert that boolean symbol was inserted
+        expected_symbols = {
+            Symbol(name='is_cold', type='boolean') : 1
+        }
+
+        self.assertEqual(parser.symbol_table.symbols, expected_symbols,
+                         "Did not insert boolean identifier to symbol table ")
 
 class TestSymbolTable(unittest.TestCase):
     """Test Symbol table methods"""

@@ -346,6 +346,7 @@ class RDP:
     """
     R11. <Declaration> ::= integer <IDs> | boolean <IDs> | real <IDs>
     """
+    # Interger declaration
     if self.token_is('keyword', 'integer'):
       self.print_production("<Declaration> --> integer <IDs>")
       if self.IDs():
@@ -354,11 +355,15 @@ class RDP:
         self.symbol_table.insert(int_tok, 'integer')
         return True
       return False
+    # Boolean declaration
     elif self.token_is('keyword', 'boolean'):
       self.print_production('<Declaration> --> boolean <IDs>')
       if self.IDs():
+        bool_tok = self.lexer.get_prev_token()
+        self.symbol_table.insert(bool_tok, 'boolean')
         return True
       return False
+    # Real declaration
     elif self.token_is('keyword', 'real'):
       self.print_production("<Declaration> --> real <IDs>")
       if self.IDs():
