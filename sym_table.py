@@ -27,6 +27,18 @@ class SymbolTable:
     if symbol in self.symbols:
       return True
     return False
+  
+  def get_mem_address(self, id_tok, type):
+    """
+    Return memory address of an identifier
+    """
+    # Raise error if symbol does not exist
+    if not self.exists_identifier(id_tok, type):
+      raise ValueError(f"{id_tok} with type {type} does not exist in symbol table")
+    # Get symbol memory address
+    symbol = Symbol(id_tok.value, type)
+    mem_address = self.symbols[symbol]
+    return mem_address
 
   def insert(self, identifier_tok, type):
     """
