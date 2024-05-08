@@ -36,7 +36,7 @@ class SymbolTable:
     # Update value of symbol if it already exists; Leave memory address the same
     if self.exists_identifier(identifier_tok):
       # Raise error if val_token type is different from current token type
-      curr_tok = self.symbols[identifier_tok]
+      curr_tok = self.symbols[identifier_tok].token
       if curr_tok.type != val_tok.type:
         raise ValueError(f"{identifier_tok.value} is {curr_tok.type} type. Cannot be assigned a different type")
     else:
@@ -51,4 +51,16 @@ class SymbolTable:
     """
     Prints/writes the symbol table to a file
     """
-    raise NotImplementedError
+    # Write headers to file
+    with open(filename, 'w') as out_file:
+      out_file.write(f"{'Identifier':20}")
+      out_file.write(f"{'Memory Location':20}")
+      out_file.write("Type")
+      out_file.write('\n')
+
+    with open(filename, 'a') as out_file:
+      for id_tok, symbol in self.symbols.items():
+        out_file.write(f"{id_tok.value:20}")
+        out_file.write(f"{str(symbol.mem_address):20}")
+        out_file.write(symbol.token.type)
+        out_file.write('\n')

@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from compiler import main
@@ -677,7 +678,94 @@ class TestSymbolTable(unittest.TestCase):
         Test that inserting an existing symbol will only update the value and 
         not increase the memory address
         """
-        raise NotImplementedError
+        # Identifier token
+        id_tok = Token('identifier', 'count')
+        # Value Token
+        int_tok = Token('integer', '1')
+        int_tok2 = Token('integer', '1')
+
+        # Insert symbol to table first time
+        symbol_table = SymbolTable()
+        symbol_table.insert(id_tok, int_tok)
+
+        # Update count identifer
+        symbol_table.insert(id_tok, int_tok2)
+
+        # Check that memory address of identifier is still 1
+        intial_mem_address = 1
+        mem_address = symbol_table.symbols[id_tok].mem_address
+        self.assertEqual(mem_address, intial_mem_address)
+
+    def test_update_wront_type_err(self):
+        """
+        Test that symbol table will raise error is user tries to update a 
+        symbol with a value of different type than what the corrent value is
+        """
+        # Identifier token
+        id_tok = Token('identifier', 'count')
+        # Value Token
+        int_tok = Token('integer', '1')
+        id_tok2 = Token('identifier', 'secondcount')
+
+        # Insert symbol to table first time
+        symbol_table = SymbolTable()
+        symbol_table.insert(id_tok, int_tok)
+
+        # Assert that error is raised
+        err_was_raised = False
+        try:
+            symbol_table.insert(id_tok, id_tok2)
+        except ValueError:
+            err_was_raised = True
+        self.assertTrue(err_was_raised, "Error not raised when assigning symbol a different type")
+
+    def test_write(self):
+        """
+        Test that write method correctly formats symbol table
+        """
+        # Identifier token : integer token  pairs for test
+        symbol_pairs = [
+            (Token('identifier', 'i'), Token('integer', '0')),
+            (Token('identifier', 'max'), Token('integer', '0')),
+            (Token('identifier', 'sum'), Token('integer', '10')),
+        ]
+
+        # Create symbol table
+        symbol_table = SymbolTable()
+        for id_tok, int_tok in symbol_pairs:
+            symbol_table.insert(id_tok, int_tok)
+
+        filename = "symbol_table_out.txt"
+        # Raise error if filename already exists
+        if os.path.isfile(filename):
+            raise ValueError(f"{filename} already exists before testing")
+        
+        # Write to filename
+        try:
+            symbol_table.write(filename)
+
+            # Assert that filename exists
+            filename_exists = os.path.isfile(filename)
+            self.assertTrue(filename_exists, "SymbolTable.write(filename) method does not output a file")
+
+            # Conver filename to array for testing
+            with open(filename) as f:
+                output_arr = f.read().split()
+
+            expected_output_arr = [
+                'Identifier', 'Memory', 'Location', 'Type',
+                'i', '1', 'integer',
+                'max', '2', 'integer',
+                'sum', '3', 'integer'
+                ]
+            
+            self.maxDiff = None
+            self.assertEqual(output_arr, expected_output_arr, "Write method did not write correct content")
+
+        finally:
+            # Remove test output file
+            if os.path.isfile(filename):
+                os.remove(filename)
 
 if __name__ == "__main__":
     unittest.main()
