@@ -889,6 +889,48 @@ class TestSymbolTable(unittest.TestCase):
             if os.path.isfile(filename):
                 os.remove(filename)
 
+    def test_append(self):
+        """
+        Test that write method can append to files
+        """
+        filename = "out_file.txt"
+        # Raise error if output file exists before testing
+        if os.path.isfile(filename):
+            raise ValueError(f"{filename} already exists before test")
+        try:
+            # Write to file before appending
+            with open(filename, 'w') as f:
+                f.write("testing123...\n")
+
+            # Create symbol table
+            id_tok = Token('identifier', 'count')
+            id_type = 'integer'
+            symbol_table = SymbolTable()
+            symbol_table.insert(id_tok, id_type)
+
+            # Append to file
+            symbol_table.write(filename, append_to_file=True)
+
+            # Read output file
+            with open(filename) as f:
+                output_file = f.read().split()
+            
+            # Assert that file was appending to
+            expected_output = [
+                'testing123...',
+                'Identifier', 'Memory', 'Location', 'Type',
+                'count', '1', 'integer'
+                ]
+            
+            self.assertEqual(output_file, expected_output,
+                "Symbol table write method did not append to file when setting append_to_file=True")
+
+        finally:
+            # Remove file when done testing
+            if os.path.isfile(filename):
+                os.remove(filename)
+
+
     def test_non_identifier_err(self):
         """
         Test that symbol table raises error if user tries to insert non identifier token as identifier
