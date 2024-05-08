@@ -644,6 +644,24 @@ class TestRDP(unittest.TestCase):
             res = txt.read().strip().split('\n')
         self.assertEqual(res, exprected_res)
 
+    def test_insert_integer_symbol(self):
+        """
+        Test that the RDP parser correctly inserts integer identifiers
+        """
+        # Integer declaration source code
+        source = "integer count"
+        l = Lexer(source)
+        parser = RDP(l)
+
+        # Run declaration method
+        parser.declaration()
+
+        # Assert that count integer was inserted
+        expected_symbols = {
+            Token(type='identifier', value='count'): Symbol(mem_address=1, type='integer')
+            }
+        self.assertEqual(parser.symbol_table.symbols, expected_symbols)
+
 class TestSymbolTable(unittest.TestCase):
     """Test Symbol table methods"""
     def test_initial_mem_address(self):
@@ -656,16 +674,14 @@ class TestSymbolTable(unittest.TestCase):
         """Test inserting a symbol to the symbol table"""
         # Identifier token
         id_tok = Token('identifier', 'count')
-        # Value Token
-        int_tok = Token('integer', '1')
 
         # Insert symbol to table
         symbol_table = SymbolTable()
-        symbol_table.insert(id_tok, int_tok)
+        symbol_table.insert(id_tok, 'integer')
 
         # Assett symbol as added to symbol table
         expected_symbol_table = {
-            Token(type='identifier', value='count'): Symbol(mem_address=1, token=Token(type='integer', value='1'))
+            Token(type='identifier', value='count'): Symbol(mem_address=1, type='integer')
             }
         self.assertEqual(symbol_table.symbols, expected_symbol_table)
 
@@ -680,16 +696,14 @@ class TestSymbolTable(unittest.TestCase):
         """
         # Identifier token
         id_tok = Token('identifier', 'count')
-        # Value Token
-        int_tok = Token('integer', '1')
-        int_tok2 = Token('integer', '1')
 
         # Insert symbol to table first time
         symbol_table = SymbolTable()
-        symbol_table.insert(id_tok, int_tok)
+        symbol_type = 'integer'
+        symbol_table.insert(id_tok, symbol_type)
 
         # Update count identifer
-        symbol_table.insert(id_tok, int_tok2)
+        symbol_table.insert(id_tok, symbol_type)
 
         # Check that memory address of identifier is still 1
         intial_mem_address = 1
@@ -703,19 +717,18 @@ class TestSymbolTable(unittest.TestCase):
         """
         # Identifier token
         id_tok = Token('identifier', 'count')
-        # Value Token
-        int_tok = Token('integer', '1')
-        id_tok2 = Token('identifier', 'secondcount')
+        symbol_type = 'integer'
+        second_type = 'identifier'
 
         # Insert symbol to table first time
         symbol_table = SymbolTable()
-        symbol_table.insert(id_tok, int_tok)
+        symbol_table.insert(id_tok, symbol_type)
 
         # Assert that error is raised
         err_was_raised = False
         try:
-            symbol_table.insert(id_tok, id_tok2)
-        except ValueError:
+            symbol_table.insert(id_tok, second_type)
+        except ValueError as err:
             err_was_raised = True
         self.assertTrue(err_was_raised, "Error not raised when assigning symbol a different type")
 
@@ -725,15 +738,15 @@ class TestSymbolTable(unittest.TestCase):
         """
         # Identifier token : integer token  pairs for test
         symbol_pairs = [
-            (Token('identifier', 'i'), Token('integer', '0')),
-            (Token('identifier', 'max'), Token('integer', '0')),
-            (Token('identifier', 'sum'), Token('integer', '10')),
+            (Token('identifier', 'i'), 'integer'),
+            (Token('identifier', 'max'), 'integer'),
+            (Token('identifier', 'sum'), 'integer'),
         ]
 
         # Create symbol table
         symbol_table = SymbolTable()
-        for id_tok, int_tok in symbol_pairs:
-            symbol_table.insert(id_tok, int_tok)
+        for id_tok, symbol_type in symbol_pairs:
+            symbol_table.insert(id_tok, symbol_type)
 
         filename = "symbol_table_out.txt"
         # Raise error if filename already exists

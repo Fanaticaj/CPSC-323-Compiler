@@ -1,4 +1,5 @@
 """Recursive Descent Parser for Syntax Analysis"""
+from sym_table import SymbolTable
 
 class RDP:
   def __init__(self, lexer, *, print_to_console=False, out_filename=None):
@@ -8,6 +9,7 @@ class RDP:
     self.print_buffer = []  # Used to print tokens after printing production
     # Store left-hand side of production until right-hand side is determined
     self.print_production_buffer = []
+    self.symbol_table = SymbolTable()
     
     # Clear out file if it is set
     if self.out_filename:
@@ -347,6 +349,9 @@ class RDP:
     if self.token_is('keyword', 'integer'):
       self.print_production("<Declaration> --> integer <IDs>")
       if self.IDs():
+        # Insert integer token to symbol table
+        int_tok = self.lexer.get_prev_token()
+        self.symbol_table.insert(int_tok, 'integer')
         return True
       return False
     elif self.token_is('keyword', 'boolean'):

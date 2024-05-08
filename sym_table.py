@@ -9,7 +9,7 @@ class Symbol:
   Class for storing symbol memory address, and token that identifer points to
   """
   mem_address: int
-  token: Token
+  type: str
 
 class SymbolTable:
   def __init__(self):
@@ -29,19 +29,19 @@ class SymbolTable:
       return True
     return False
 
-  def insert(self, identifier_tok, val_tok):
+  def insert(self, identifier_tok, type):
     """
     Insert/update an identifier token equal to another token in the symbol table
     """
     # Update value of symbol if it already exists; Leave memory address the same
     if self.exists_identifier(identifier_tok):
       # Raise error if val_token type is different from current token type
-      curr_tok = self.symbols[identifier_tok].token
-      if curr_tok.type != val_tok.type:
-        raise ValueError(f"{identifier_tok.value} is {curr_tok.type} type. Cannot be assigned a different type")
+      curr_type = self.symbols[identifier_tok].type
+      if curr_type != type:
+        raise ValueError(f"{identifier_tok.value} is {curr_type} type. Cannot be assigned a different type")
     else:
       # Create symbol for val_tok
-      symbol = Symbol(self.mem_address, val_tok)
+      symbol = Symbol(self.mem_address, type)
       # Insert new symbol to symbol table
       self.symbols[identifier_tok] = symbol
       # Increment memory address for next symbol
@@ -62,5 +62,5 @@ class SymbolTable:
       for id_tok, symbol in self.symbols.items():
         out_file.write(f"{id_tok.value:20}")
         out_file.write(f"{str(symbol.mem_address):20}")
-        out_file.write(symbol.token.type)
+        out_file.write(symbol.type)
         out_file.write('\n')
