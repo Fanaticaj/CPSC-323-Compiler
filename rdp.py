@@ -398,6 +398,10 @@ class RDP:
       if is_recursive:
         self.print_production("<IDs> --> <Identifier>, <IDs>")
         if self.token_is('identifier'):
+          # Insert to symbol table with type None (will be updated with last 
+          # symbol in declaration list)
+          prev_tok = self.lexer.get_prev_token()
+          self.symbol_table.insert(prev_tok, None)
           if self.token_is('separator', ','):
             if self.IDs():
               return True

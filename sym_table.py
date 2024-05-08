@@ -46,6 +46,20 @@ class SymbolTable:
     # Increment memory address for next symbol
     self.mem_address += 1
 
+    # Replace all previous symbols with type of None with same type as this symbol
+    # Needed for declaration list identifiers
+    if type:
+      # Get list of all symbols of type None
+      none_symbols = [symbol for symbol in self.symbols if symbol.type == None]
+      for symbol in none_symbols:
+        # Create new symbol with updated type
+        new_symbol = Symbol(symbol.name, type)
+        mem_address = self.symbols[symbol]
+        # Delete old symbol form symbols dictionary
+        del self.symbols[symbol]
+        # Insert updated symbol to dictionary
+        self.symbols[new_symbol] = mem_address
+
   def write(self, filename):
     """
     Prints/writes the symbol table to a file

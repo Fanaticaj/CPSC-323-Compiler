@@ -683,6 +683,36 @@ class TestRDP(unittest.TestCase):
         self.assertEqual(parser.symbol_table.symbols, expected_symbols,
                          "Did not insert boolean identifier to symbol table ")
 
+    def test_insert_declaration_list(self):
+        """
+        Test that RDP parser inserts all identifers when a single type defines
+        more than one identifier.
+        ie integer i, j, k;  <-- Should insert 3 symbols to table
+        """
+        source = "integer i, j, k;boolean l, m, n;"
+        l = Lexer(source)
+        parser = RDP(l)
+
+        # Run declaration method
+        parser.declaration_list()
+
+        # Assert all identifers were inserted to symbol table
+        expected_length = 6
+        self.assertEqual(len(parser.symbol_table.symbols), expected_length,
+                         "RDP parser does not insert all identifers in declartion list to symbol table")
+ 
+        # Assert symbols are in correct order
+        expected_symbols = {
+            Symbol(name='i', type='integer') : 1,
+            Symbol(name='j', type='integer') : 2,
+            Symbol(name='k', type='integer') : 3,
+            Symbol(name='l', type='boolean') : 4,
+            Symbol(name='m', type='boolean') : 5,
+            Symbol(name='n', type='boolean') : 6,
+        }
+
+        self.assertEqual(parser.symbol_table.symbols,  expected_symbols)
+
 class TestSymbolTable(unittest.TestCase):
     """Test Symbol table methods"""
     def test_initial_mem_address(self):
