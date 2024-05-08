@@ -33,6 +33,10 @@ class SymbolTable:
     """
     Insert/update an identifier token equal to another token in the symbol table
     """
+    # Raise error if not an identifier token
+    if identifier_tok.type != 'identifier':
+      raise ValueError("Can only insert identifiers to symbol table")
+
     # Update value of symbol if it already exists; Leave memory address the same
     if self.exists_identifier(identifier_tok):
       # Raise error if val_token type is different from current token type

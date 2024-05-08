@@ -780,5 +780,21 @@ class TestSymbolTable(unittest.TestCase):
             if os.path.isfile(filename):
                 os.remove(filename)
 
+    def test_non_identifier_err(self):
+        """
+        Test that symbol table raises error if user tries to insert non identifier token as identifier
+        """
+        # Create symbol table
+        tok = Token('integer', '22')
+        symbol_table = SymbolTable()
+
+        # Insert non identifier symbol
+        raised_err = False
+        try:
+            symbol_table.insert(tok, 'integer')
+        except ValueError:
+            raised_err = True
+        self.assertTrue(raised_err, "Did not raise error when user inserted non identifier symbol")
+
 if __name__ == "__main__":
     unittest.main()
