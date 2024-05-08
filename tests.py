@@ -633,16 +633,24 @@ class TestRDP(unittest.TestCase):
             'Token: separator       Lexeme: ;',
             'Token: separator       Lexeme: $'
             ]
-        
+                
         # Save productions to temp_out file
         filepath = "RAT24S_programs/print_true.source"
         temp_out = "test_out.txt"
-        main(filepath, False, None, False, temp_out, None, supress_print=True)
+
+        # Raise error if temp_out file exists before running tests
+        if os.path.isfile(temp_out):
+            raise ValueError(f"{temp_out} already exists before running test")
+        try:
+            main(filepath, False, None, False, temp_out, None, supress_print=True)
         
-        # Open temp_out file
-        with open(temp_out) as txt:
-            res = txt.read().strip().split('\n')
-        self.assertEqual(res, exprected_res)
+            # Open temp_out file
+            with open(temp_out) as txt:
+                res = txt.read().strip().split('\n')
+            self.assertEqual(res, exprected_res)
+        finally:
+            # Remove output file
+            os.remove(temp_out)
 
     def test_symbol_table_arg(self):
         """
