@@ -72,7 +72,8 @@ class SymbolTable:
       out_file.write('\n')
 
     with open(filename, 'a') as out_file:
-      for symbol, mem_address in self.symbols.items():
+      sorted_symbols = sorted(self.symbols.items(), key=lambda item: item[1])
+      for symbol, mem_address in sorted_symbols:
         out_file.write(f"{symbol.name:20}")
         out_file.write(f"{str(mem_address):20}")
         out_file.write(symbol.type)

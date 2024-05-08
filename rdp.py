@@ -74,6 +74,10 @@ class RDP:
     """Append txt to output file"""
     with open(self.out_filename, 'a') as out_txt:
       out_txt.write(f"{txt}\n")
+
+  def write_symbol_table(self, filename):
+    """Write symbol table to a file"""
+    self.symbol_table.write(filename)
       
   def rat24s(self):
       """

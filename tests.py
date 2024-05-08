@@ -637,12 +637,50 @@ class TestRDP(unittest.TestCase):
         # Save productions to temp_out file
         filepath = "RAT24S_programs/print_true.source"
         temp_out = "test_out.txt"
-        main(filepath, False, None, False, temp_out)
+        main(filepath, False, None, False, temp_out, None, supress_print=True)
         
         # Open temp_out file
         with open(temp_out) as txt:
             res = txt.read().strip().split('\n')
         self.assertEqual(res, exprected_res)
+
+    def test_symbol_table_arg(self):
+        """
+        Test that using the --symbol-table argument in the command line
+        will save the symbol table correctly to a file
+        """
+        # Save symbol table to out file
+        testcase_file = "RAT24S_programs/add_sum.txt"
+        out_filename = "sym_table_out.txt"
+
+        # Raise error if out_filename exists before running test
+        if os.path.isfile(out_filename):
+            raise ValueError(f"{out_filename} exists before testing")
+
+        try:
+            main(testcase_file, False, None, False, None, out_filename,
+                supress_print=True)
+            
+            # Assert file was saved
+            self.assertTrue(os.path.isfile(out_filename))
+
+            # Open output file
+            with open(out_filename) as out_txt:
+                res = out_txt.read().split()
+            expected_res = [
+                'Identifier', 'Memory', 'Location', 'Type',
+                'i', '1', 'integer',
+                'max', '2', 'integer',
+                'sum', '3', 'integer',
+                'j', '4', 'boolean',
+                'k', '5', 'boolean',
+                'l', '6', 'boolean'
+                ]
+
+            self.assertEqual(res, expected_res)
+        finally:
+            # Remove test file
+            os.remove(out_filename)
 
     def test_insert_integer_symbol(self):
         """

@@ -28,6 +28,9 @@ def parse_arguments():
     # Arg to save RDP productions to file
     arg_parser.add_argument('-s', '--save-productions', action='store',
                             default=None, help="Save syntax analyzer productions to a file")
+    # ARg to save symbol table to a file
+    arg_parser.add_argument('--symbol-table', action='store',
+                            default=None, help="Save symbol table to a file")
     
     # Parse command-line arguments
     path = Path(arg_parser.parse_args().source_code)
@@ -35,5 +38,6 @@ def parse_arguments():
     tokens_filename = arg_parser.parse_args().save_tokens
     print_prods = arg_parser.parse_args().print_productions
     out_filename = arg_parser.parse_args().save_productions
+    sym_table_filename = arg_parser.parse_args().symbol_table
     
-    return path, print_tokens, tokens_filename, print_prods, out_filename
+    return path, print_tokens, tokens_filename, print_prods, out_filename, sym_table_filename
