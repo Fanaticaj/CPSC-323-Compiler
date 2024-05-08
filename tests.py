@@ -367,7 +367,7 @@ class TestRDP(unittest.TestCase):
         for statement in statements:
             l = Lexer(statement)
             parser = RDP(l)
-            is_statement = parser.statement()
+            is_statement = parser.statement(IGNORE_SYMBOL_TABLE=True)
             self.assertTrue(is_statement, f"Not recognized as Statement: {statement}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {statement}")
 
@@ -930,7 +930,6 @@ class TestSymbolTable(unittest.TestCase):
             if os.path.isfile(filename):
                 os.remove(filename)
 
-
     def test_non_identifier_err(self):
         """
         Test that symbol table raises error if user tries to insert non identifier token as identifier
@@ -946,6 +945,54 @@ class TestSymbolTable(unittest.TestCase):
         except ValueError:
             raised_err = True
         self.assertTrue(raised_err, "Did not raise error when user inserted non identifier symbol")
+
+    def test_get_mem_address(self):
+        """
+        Test that correct memory address is returned by get_mem_address method
+        """
+        # Setup symbol table
+        id_tok = Token('identifier', 'count')
+        id_type = 'integer'
+        id_addr = 1
+        id2_tok = Token('identifier', 'isfull')
+        id2_type = 'boolean'
+        id2_addr = 2
+        symbol_table = SymbolTable()
+        symbol_table.insert(id_tok, id_type)
+        symbol_table.insert(id2_tok, id2_type)
+
+        # Assert correct address is returned
+        self.assertEqual(symbol_table.get_mem_address(id2_tok, id2_type), id2_addr)
+        self.assertEqual(symbol_table.get_mem_address(id_tok, id_type), id_addr)
+
+class TestAssemblyInstructions(unittest.TestCase):
+    """Test that assembly instructions are generated correctly"""
+    def test_assignment(self):
+        """
+        Test that correct assembly instructions are generated for assignment productions
+        sum = 0;
+        Should generate:
+        1 PUSHI 0
+        2 POPM 1
+        """
+        # Run parser with source code
+        source = "integer sum;sum = 0;"
+        l = Lexer(source)
+        parser = RDP(l)
+        # Run declaration_lsit first to update symbol table
+        parser.declaration_list()
+        # Run assign to update assembly instructions
+        parser.assign()
+
+        # Assert first instruction is: PUSHI 0
+        correct_instruction = "PUSHI 0"
+        actual_instruction = parser.asm_instructions[0]
+        self.assertEqual(actual_instruction, correct_instruction)
+
+        # Assert second instruction is: POPM 1
+        correct_instruction = "POPM 1"
+        actual_instruction = parser.asm_instructions[1]
+        self.assertEqual(actual_instruction, correct_instruction)
 
 if __name__ == "__main__":
     unittest.main()

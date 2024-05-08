@@ -9,6 +9,7 @@ class RDP:
     self.print_buffer = []  # Used to print tokens after printing production
     # Store left-hand side of production until right-hand side is determined
     self.print_production_buffer = []
+    self.asm_instructions = []
     self.symbol_table = SymbolTable()
     
     # Clear out file if it is set
@@ -456,7 +457,7 @@ class RDP:
 
 
   
-  def statement(self, *, IGNORE_PRINT=False):
+  def statement(self, *, IGNORE_PRINT=False, IGNORE_SYMBOL_TABLE=False):
     """
     R14. <Statement> ::= <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
     """
@@ -464,9 +465,9 @@ class RDP:
       self.print_production("<Statement> -->", to_be_continued=True)
     if self.compound():
       return True
-    elif self.assign():
+    elif self.assign(IGNORE_SYMBOL_TABLE=IGNORE_SYMBOL_TABLE):
       return True
-    elif self.If():
+    elif self.If(IGNORE_SYMBOL_TABLE=IGNORE_SYMBOL_TABLE):
        return True
     elif self.Return():
        return True
@@ -496,16 +497,24 @@ class RDP:
     else:
         return False
   
-  def assign(self):
+  def assign(self, *, IGNORE_SYMBOL_TABLE=False):
     """
     R16. <Assign> ::= <Identifier> = <Expression> ;
     """
     if self.token_is('identifier'):
       self.finish_production_print("<Assign>")
       self.print_production("<Assign> --> <Identifier> = <Expression> ;")
+      id_tok = self.lexer.get_prev_token()
       if self.token_is('operator', '='):
         if self.expression():
+          assign_tok = self.lexer.get_prev_token()
+          assign_type = assign_tok.type
           if self.token_is('separator', ';'):
+            # Add POPM instruction to asm_instructions
+            # Get mem address of identifer
+            if assign_type == 'integer' and not IGNORE_SYMBOL_TABLE: # Temporary since only integers added to symbol table
+              mem_address = self.symbol_table.get_mem_address(id_tok, assign_type)
+              self.asm_instructions.append(f"POPM {mem_address}")
             return True
           else:
             return False
@@ -516,7 +525,7 @@ class RDP:
     else:
        return False
 
-  def If(self):
+  def If(self, *, IGNORE_SYMBOL_TABLE=False):
     """
     R17. <If> ::= if ( <Condition> ) <Statement> <If_prime>
     """
@@ -526,7 +535,7 @@ class RDP:
       if self.token_is('separator', '('):
         if self.condition():
           if self.token_is('separator', ')'):
-            if self.statement():
+            if self.statement(IGNORE_SYMBOL_TABLE=IGNORE_SYMBOL_TABLE):
               if self.If_prime():
                  return True
               else:
@@ -757,6 +766,10 @@ class RDP:
         return True
     elif self.token_is('integer'):
       self.print_production('<Primary> --> <Integer>')
+      int_tok = self.lexer.get_prev_token()
+      if int_tok:
+        int_val = int_tok.value
+        self.asm_instructions.append(f"PUSHI {int_val}")
       return True
     elif self.token_is('separator', '('):
       self.print_production('<Primary> --> ( <Expression> )')
