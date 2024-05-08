@@ -1,14 +1,12 @@
 """Symbol table for object code generation to keep track of identifiers"""
 from dataclasses import dataclass
 
-from parse_token import Token
-
-@dataclass
+@dataclass(frozen=True)
 class Symbol:
   """
-  Class for storing symbol memory address, and token that identifer points to
+  Class for storing name and type of symbol
   """
-  mem_address: int
+  name: str
   type: str
 
 class SymbolTable:
@@ -17,15 +15,16 @@ class SymbolTable:
     # mem_address is the memory address that will be assigned to next new symbol
     self.mem_address = 1
     # symbols dictionary to store all identifiers
-    # Key: identifier token
-    # Value: Symbol object
+    # Key: Symbol(name, type)
+    # Value: memory address
     self.symbols = {}
 
-  def exists_identifier(self, identifier_tok):
+  def exists_identifier(self, identifier_tok, type):
     """
     Returns true if an identifier exists in the symbol table, false otherwise
     """
-    if identifier_tok in self.symbols:
+    symbol = Symbol(identifier_tok.value, type)
+    if symbol in self.symbols:
       return True
     return False
 
@@ -37,19 +36,15 @@ class SymbolTable:
     if identifier_tok.type != 'identifier':
       raise ValueError("Can only insert identifiers to symbol table")
 
-    # Update value of symbol if it already exists; Leave memory address the same
-    if self.exists_identifier(identifier_tok):
-      # Raise error if val_token type is different from current token type
-      curr_type = self.symbols[identifier_tok].type
-      if curr_type != type:
-        raise ValueError(f"{identifier_tok.value} is {curr_type} type. Cannot be assigned a different type")
-    else:
-      # Create symbol for val_tok
-      symbol = Symbol(self.mem_address, type)
-      # Insert new symbol to symbol table
-      self.symbols[identifier_tok] = symbol
-      # Increment memory address for next symbol
-      self.mem_address += 1
+    # Raise ValueError if identifier already exists in table with same type
+    if self.exists_identifier(identifier_tok, type):
+      raise ValueError(f"{identifier_tok} already exists in table with type {type}")
+
+    symbol = Symbol(identifier_tok.value, type)
+    # Insert new symbol to symbol table
+    self.symbols[symbol] = self.mem_address
+    # Increment memory address for next symbol
+    self.mem_address += 1
 
   def write(self, filename):
     """
@@ -63,8 +58,8 @@ class SymbolTable:
       out_file.write('\n')
 
     with open(filename, 'a') as out_file:
-      for id_tok, symbol in self.symbols.items():
-        out_file.write(f"{id_tok.value:20}")
-        out_file.write(f"{str(symbol.mem_address):20}")
+      for symbol, mem_address in self.symbols.items():
+        out_file.write(f"{symbol.name:20}")
+        out_file.write(f"{str(mem_address):20}")
         out_file.write(symbol.type)
         out_file.write('\n')

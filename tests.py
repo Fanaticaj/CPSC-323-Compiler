@@ -658,7 +658,7 @@ class TestRDP(unittest.TestCase):
 
         # Assert that count integer was inserted
         expected_symbols = {
-            Token(type='identifier', value='count'): Symbol(mem_address=1, type='integer')
+            Symbol(name='count', type='integer') : 1
             }
         self.assertEqual(parser.symbol_table.symbols, expected_symbols)
 
@@ -670,18 +670,33 @@ class TestSymbolTable(unittest.TestCase):
         symbol_table = SymbolTable()
         self.assertEqual(symbol_table.mem_address, init_mem_address)
 
+    def test_exists_identifier(self):
+        """
+        Test exists_identifier method
+        """
+        id_tok = Token('identifier', 'count') # Will exist
+        id_tok2 = Token('identifier', 'sum') # Will not exist
+        sym_type = 'integer'
+
+        symbol_table = SymbolTable()
+        symbol_table.insert(id_tok, sym_type)
+
+        self.assertTrue(symbol_table.exists_identifier(id_tok, sym_type))
+        self.assertFalse(symbol_table.exists_identifier(id_tok2, sym_type))
+
     def test_insert_symbol(self):
         """Test inserting a symbol to the symbol table"""
         # Identifier token
         id_tok = Token('identifier', 'count')
+        symbol_type = 'integer'
 
         # Insert symbol to table
         symbol_table = SymbolTable()
-        symbol_table.insert(id_tok, 'integer')
+        symbol_table.insert(id_tok, symbol_type)
 
         # Assett symbol as added to symbol table
         expected_symbol_table = {
-            Token(type='identifier', value='count'): Symbol(mem_address=1, type='integer')
+            Symbol(name='count', type='integer') : 1
             }
         self.assertEqual(symbol_table.symbols, expected_symbol_table)
 
@@ -689,48 +704,45 @@ class TestSymbolTable(unittest.TestCase):
         expected_mem_address = 2
         self.assertEqual(symbol_table.mem_address, expected_mem_address)
 
-    def test_update_symbol(self):
+    def test_duplicate_err(self):
         """
-        Test that inserting an existing symbol will only update the value and 
-        not increase the memory address
+        Test that symbol table will raise error if an identifier with same name
+        and same type is inserted to the table more than once
         """
-        # Identifier token
         id_tok = Token('identifier', 'count')
+        id_tok2 = Token('identifier', 'count')
+        sym_type = 'integer'
 
-        # Insert symbol to table first time
         symbol_table = SymbolTable()
-        symbol_type = 'integer'
-        symbol_table.insert(id_tok, symbol_type)
+        symbol_table.insert(id_tok, sym_type)
 
-        # Update count identifer
-        symbol_table.insert(id_tok, symbol_type)
+        with self.assertRaises(ValueError):
+            symbol_table.insert(id_tok2, sym_type)
 
-        # Check that memory address of identifier is still 1
-        intial_mem_address = 1
-        mem_address = symbol_table.symbols[id_tok].mem_address
-        self.assertEqual(mem_address, intial_mem_address)
-
-    def test_update_wront_type_err(self):
+    def test_same_name_diff_type_entry(self):
         """
-        Test that symbol table will raise error is user tries to update a 
-        symbol with a value of different type than what the corrent value is
+        Test that identifiers of the same name but different type can be 
+        inserted to the symbol table
         """
-        # Identifier token
         id_tok = Token('identifier', 'count')
-        symbol_type = 'integer'
-        second_type = 'identifier'
+        id_type = 'integer'
+        id2_tok = Token('identifier', 'count')
+        id2_type = 'identifier'
 
-        # Insert symbol to table first time
         symbol_table = SymbolTable()
-        symbol_table.insert(id_tok, symbol_type)
+        
+        # Insert first identifier
+        symbol_table.insert(id_tok, id_type)
 
-        # Assert that error is raised
-        err_was_raised = False
-        try:
-            symbol_table.insert(id_tok, second_type)
-        except ValueError as err:
-            err_was_raised = True
-        self.assertTrue(err_was_raised, "Error not raised when assigning symbol a different type")
+        # Insert second identifier
+        symbol_table.insert(id2_tok, id2_type)
+
+        expected_symbols = {
+            Symbol(name='count', type='integer'): 1,
+            Symbol(name='count', type='identifier'): 2
+            }
+        
+        self.assertEqual(symbol_table.symbols, expected_symbols)
 
     def test_write(self):
         """
