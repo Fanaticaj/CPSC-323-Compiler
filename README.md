@@ -14,17 +14,21 @@
 ## 1. Compiler Usage
 
 ```bash
-usage: compiler.py [-h] [-p] [-t] [-o OUTPUT] [SourceCodeFilePath]
+usage: compiler.py [-h] [--print-tokens] [--save-tokens SAVE_TOKENS] [--print-productions] [-s SAVE_PRODUCTIONS] [--symbol-table SYMBOL_TABLE] source file
 
 positional arguments:
-  SourceCodeFilePath    Path to the source code file that will be compiled
+  source file           Path to the source code file that will be compiled
 
 options:
   -h, --help            show this help message and exit
-  -p, --print-all       print source code and tokens
-  -t, --print-tokens    print tokens returned by lexer
-  -o OUTPUT, --output OUTPUT
-                        Specify output file
+  --print-tokens        print tokens returned by lexer
+  --save-tokens SAVE_TOKENS
+                        Specify output file for tokens
+  --print-productions   Print productions to console
+  -s SAVE_PRODUCTIONS, --save-productions SAVE_PRODUCTIONS
+                        Save syntax analyzer productions to a file
+  --symbol-table SYMBOL_TABLE
+                        Save symbol table to a file
 ```
 
 ## 2. Language Specification
