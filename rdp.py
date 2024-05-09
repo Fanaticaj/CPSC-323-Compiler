@@ -498,7 +498,7 @@ class RDP:
           if self.token_is('separator', ';'):
             # Add POPM instruction to asm_instructions
             # Get mem address of identifer
-            if assign_type == 'integer' and not self.ignore_symbol_table: # Temporary since only integers added to symbol table
+            if assign_type == 'integer' and not self.ignore_symbol_table and not self.checking_recursive: # Temporary since only integers added to symbol table
               mem_address = self.symbol_table.get_mem_address(id_tok, assign_type)
               self.asm_instructions.append(f"POPM {mem_address}")
             return True
@@ -753,7 +753,7 @@ class RDP:
     elif self.token_is('integer'):
       self.print_production('<Primary> --> <Integer>')
       int_tok = self.lexer.get_prev_token()
-      if int_tok:
+      if int_tok and not self.checking_recursive:
         int_val = int_tok.value
         self.asm_instructions.append(f"PUSHI {int_val}")
       return True
