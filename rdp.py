@@ -11,9 +11,11 @@ class RDP:
     self.print_production_buffer = []
     self.asm_instructions = []
     self.symbol_table = SymbolTable()
+    # Make this attribute True when looking ahead
+    self.checking_recursive = False
     
     # Clear out file if it is set
-    if self.out_filename:
+    if self.out_filename and not self.checking_recursive:
         with open(self.out_filename, 'w') as out_txt:
           out_txt.write("")
     
@@ -46,7 +48,7 @@ class RDP:
     elif self.print_to_console:
       print(prod)
         
-    if self.out_filename:
+    if self.out_filename and not self.checking_recursive:
       # Append to outfile here
       if not to_be_continued:
         self.append_to_file(prod)
@@ -56,19 +58,19 @@ class RDP:
     left_hand_side = ' '.join(self.print_production_buffer)
     self.print_production_buffer.clear()
     prod = f"{left_hand_side} {production}"
-    if self.print_to_console:
+    if self.print_to_console and not self.checking_recursive:
       print(prod)
     
-    if self.out_filename:
+    if self.out_filename and not self.checking_recursive:
       self.append_to_file(prod)
 
   def print_token(self, token):
     """Print token and append to file a token"""
     tok = f"Token: {token.type:15} Lexeme: {token.value}"
-    if self.print_to_console:
+    if self.print_to_console and not self.checking_recursive:
       print(tok)
       
-    if self.out_filename:
+    if self.out_filename and not self.checking_recursive:
       self.append_to_file(f"{tok}")
       
   def append_to_file(self, txt):
@@ -139,17 +141,13 @@ class RDP:
   
   def is_function_definitions_recursive(self):
     """Return True if function definitions includes more than one function, False otherwise"""
-    temp_print_to_console = self.print_to_console
-    temp_filename = self.out_filename
-    self.out_filename = None
-    self.print_to_console = False
+    self.checking_recursive = True
     curr = self.lexer.curr_token
     # Read first function
     self.function()
     is_recursive = self.function()
-    self.print_to_console = temp_print_to_console
-    self.out_filename = temp_filename
     self.lexer.curr_token = curr
+    self.checking_recursive = False
     return is_recursive
   
   def function_definitions(self):
@@ -221,10 +219,7 @@ class RDP:
   
   def is_parameter_list_recursive(self):
     """Return True if <Parameter occurs more than once, False otherwise"""
-    temp_print_to_console = self.print_to_console
-    temp_filename = self.out_filename
-    self.out_filename = None
-    self.print_to_console = False
+    self.checking_recursive = True
     curr = self.lexer.curr_token
     # Read first function
     self.parameter()
@@ -233,9 +228,8 @@ class RDP:
       is_recursive = True
     else:
       is_recursive = False
-    self.print_to_console = temp_print_to_console
-    self.out_filename = temp_filename
     self.lexer.curr_token = curr
+    self.checking_recursive = False
     return is_recursive
   
   def parameter_list(self):
@@ -378,10 +372,7 @@ class RDP:
   
   def is_IDs_recursive(self):
     """Return True if there is more than one IDs, False otherwise"""
-    temp_print_to_console = self.print_to_console
-    temp_filename = self.out_filename
-    self.out_filename = None
-    self.print_to_console = False
+    self.checking_recursive = True
     curr = self.lexer.curr_token
     self.token_is('identifier')
     next_token = self.lexer.peek_next_token()
@@ -389,9 +380,8 @@ class RDP:
       is_recursive = True
     else:
       is_recursive = False
-    self.print_to_console = temp_print_to_console
-    self.out_filename = temp_filename
     self.lexer.curr_token = curr
+    self.checking_recursive = False
     return is_recursive
 
   def IDs(self):
@@ -425,16 +415,12 @@ class RDP:
         
   def is_statement_list_recursive(self):
     """Return True if statement occurs more than once, false otherwise"""
-    temp_print_to_console = self.print_to_console
-    temp_filename = self.out_filename
-    self.out_filename = None
-    self.print_to_console = False
+    self.checking_recursive = True
     curr = self.lexer.curr_token
-    self.statement(IGNORE_PRINT=True)
-    is_recursive = self.statement(IGNORE_PRINT=True)
-    self.print_to_console = temp_print_to_console
-    self.out_filename = temp_filename
+    self.statement()
+    is_recursive = self.statement()
     self.lexer.curr_token = curr
+    self.checking_recursive = False
     return is_recursive
 
   def statement_list(self):
@@ -454,14 +440,12 @@ class RDP:
       if self.statement():
         return True
       return False
-
-
   
-  def statement(self, *, IGNORE_PRINT=False, IGNORE_SYMBOL_TABLE=False):
+  def statement(self, *, IGNORE_SYMBOL_TABLE=False):
     """
     R14. <Statement> ::= <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
     """
-    if not IGNORE_PRINT:
+    if not self.checking_recursive:
       self.print_production("<Statement> -->", to_be_continued=True)
     if self.compound():
       return True
