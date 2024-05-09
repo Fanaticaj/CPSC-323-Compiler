@@ -367,7 +367,8 @@ class TestRDP(unittest.TestCase):
         for statement in statements:
             l = Lexer(statement)
             parser = RDP(l)
-            is_statement = parser.statement(IGNORE_SYMBOL_TABLE=True)
+            parser.ignore_symbol_table = True
+            is_statement = parser.statement()
             self.assertTrue(is_statement, f"Not recognized as Statement: {statement}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {statement}")
 
