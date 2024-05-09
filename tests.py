@@ -608,88 +608,6 @@ class TestRDP(unittest.TestCase):
         is_empty = parser.empty()
         self.assertTrue(is_empty, f"Not recognized as Empty: {empty}")
         self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {empty}")
-        
-    def test_output(self):
-        """Run compiler with print_true.source program and check productions output"""
-        exprected_res = [
-            'Token: separator       Lexeme: $',
-            '  <Rat24S> --> $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $',
-            '  <Opt Function Definitions> --> <Empty>',
-            'Token: separator       Lexeme: $',
-            '  <Opt Declaration List> --> <Empty>',
-            'Token: separator       Lexeme: $',
-            '  <Statement List> --> <Statement>',
-            'Token: keyword         Lexeme: print',
-            '  <Statement> --> <Print>',
-            '  <Print> --> print ( <Expression>);',
-            'Token: separator       Lexeme: (',
-            '  <Expression> --> <Term> <Expression_prime>',
-            '  <Term> --> <Factor> <Term_prime>',
-            '  <Factor> --> <Primary>',
-            'Token: keyword         Lexeme: true',
-            '  <Primary> --> true',
-            '  <Term_prime> --> <Empty>',
-            '  <Expression_prime> --> <Empty>',
-            'Token: separator       Lexeme: )',
-            'Token: separator       Lexeme: ;',
-            'Token: separator       Lexeme: $'
-            ]
-                
-        # Save productions to temp_out file
-        filepath = "RAT24S_programs/print_true.source"
-        temp_out = "test_out.txt"
-
-        # Raise error if temp_out file exists before running tests
-        if os.path.isfile(temp_out):
-            raise ValueError(f"{temp_out} already exists before running test")
-        try:
-            main(filepath, False, None, False, temp_out, None, supress_print=True)
-        
-            # Open temp_out file
-            with open(temp_out) as txt:
-                res = txt.read().strip().split('\n')
-            self.assertEqual(res, exprected_res)
-        finally:
-            # Remove output file
-            os.remove(temp_out)
-
-    def test_symbol_table_arg(self):
-        """
-        Test that using the --symbol-table argument in the command line
-        will save the symbol table correctly to a file
-        """
-        # Save symbol table to out file
-        testcase_file = "RAT24S_programs/add_sum.txt"
-        out_filename = "sym_table_out.txt"
-
-        # Raise error if out_filename exists before running test
-        if os.path.isfile(out_filename):
-            raise ValueError(f"{out_filename} exists before testing")
-
-        try:
-            main(testcase_file, False, None, False, None, out_filename,
-                supress_print=True)
-            
-            # Assert file was saved
-            self.assertTrue(os.path.isfile(out_filename))
-
-            # Open output file
-            with open(out_filename) as out_txt:
-                res = out_txt.read().split()
-            expected_res = [
-                'Identifier', 'Memory', 'Location', 'Type',
-                'i', '1', 'integer',
-                'max', '2', 'integer',
-                'sum', '3', 'integer',
-                'j', '4', 'boolean',
-                'k', '5', 'boolean',
-                'l', '6', 'boolean'
-                ]
-
-            self.assertEqual(res, expected_res)
-        finally:
-            # Remove test file
-            os.remove(out_filename)
 
     def test_insert_integer_symbol(self):
         """
@@ -965,6 +883,93 @@ class TestSymbolTable(unittest.TestCase):
         # Assert correct address is returned
         self.assertEqual(symbol_table.get_mem_address(id2_tok, id2_type), id2_addr)
         self.assertEqual(symbol_table.get_mem_address(id_tok, id_type), id_addr)
+
+class TestCompiler(unittest.TestCase):
+    """
+    Test compiler.py module. Mainly test argument parsing and output
+    """
+    def test_output(self):
+        """Run compiler with print_true.source program and check productions output"""
+        exprected_res = [
+            'Token: separator       Lexeme: $',
+            '  <Rat24S> --> $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $',
+            '  <Opt Function Definitions> --> <Empty>',
+            'Token: separator       Lexeme: $',
+            '  <Opt Declaration List> --> <Empty>',
+            'Token: separator       Lexeme: $',
+            '  <Statement List> --> <Statement>',
+            'Token: keyword         Lexeme: print',
+            '  <Statement> --> <Print>',
+            '  <Print> --> print ( <Expression>);',
+            'Token: separator       Lexeme: (',
+            '  <Expression> --> <Term> <Expression_prime>',
+            '  <Term> --> <Factor> <Term_prime>',
+            '  <Factor> --> <Primary>',
+            'Token: keyword         Lexeme: true',
+            '  <Primary> --> true',
+            '  <Term_prime> --> <Empty>',
+            '  <Expression_prime> --> <Empty>',
+            'Token: separator       Lexeme: )',
+            'Token: separator       Lexeme: ;',
+            'Token: separator       Lexeme: $'
+            ]
+                
+        # Save productions to temp_out file
+        filepath = "RAT24S_programs/print_true.source"
+        temp_out = "test_out.txt"
+
+        # Raise error if temp_out file exists before running tests
+        if os.path.isfile(temp_out):
+            raise ValueError(f"{temp_out} already exists before running test")
+        try:
+            main(filepath, False, None, False, temp_out, None, None, None,
+                 supress_print=True)
+        
+            # Open temp_out file
+            with open(temp_out) as txt:
+                res = txt.read().strip().split('\n')
+            self.assertEqual(res, exprected_res)
+        finally:
+            # Remove output file
+            os.remove(temp_out)
+
+    def test_symbol_table_arg(self):
+        """
+        Test that using the --symbol-table argument in the command line
+        will save the symbol table correctly to a file
+        """
+        # Save symbol table to out file
+        testcase_file = "RAT24S_programs/add_sum.txt"
+        out_filename = "sym_table_out.txt"
+
+        # Raise error if out_filename exists before running test
+        if os.path.isfile(out_filename):
+            raise ValueError(f"{out_filename} exists before testing")
+
+        try:
+            main(testcase_file, False, None, False, None, out_filename,
+                 None, None, supress_print=True)
+            
+            # Assert file was saved
+            self.assertTrue(os.path.isfile(out_filename))
+
+            # Open output file
+            with open(out_filename) as out_txt:
+                res = out_txt.read().split()
+            expected_res = [
+                'Identifier', 'Memory', 'Location', 'Type',
+                'i', '1', 'integer',
+                'max', '2', 'integer',
+                'sum', '3', 'integer',
+                'j', '4', 'boolean',
+                'k', '5', 'boolean',
+                'l', '6', 'boolean'
+                ]
+
+            self.assertEqual(res, expected_res)
+        finally:
+            # Remove test file
+            os.remove(out_filename)
 
 class TestAssemblyInstructions(unittest.TestCase):
     """Test that assembly instructions are generated correctly"""
