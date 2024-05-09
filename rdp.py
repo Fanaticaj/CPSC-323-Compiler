@@ -91,7 +91,7 @@ class RDP:
     # Write assembly instructions
     with open(filename, 'w') as out_file:
       for line_num, instruction in enumerate(self.asm_instructions):
-        out_file.write(f"{line_num:<5}{instruction}\n")
+        out_file.write(f"{line_num + 1:<5}{instruction}\n")
 
       # Newline to separate instructions and symbol table
       out_file.write('\n')

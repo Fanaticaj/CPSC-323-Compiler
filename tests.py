@@ -1030,8 +1030,8 @@ class TestAssemblyInstructions(unittest.TestCase):
             
             # Assert correct output
             expected_output = [
-                '0    PUSHI 0',
-                '1    POPM 1',
+                '1    PUSHI 0',
+                '2    POPM 1',
                 '',
                 'Identifier          Memory Location     Type',
                 'sum                 1                   integer',
