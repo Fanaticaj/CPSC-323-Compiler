@@ -971,6 +971,35 @@ class TestCompiler(unittest.TestCase):
             # Remove test file
             os.remove(out_filename)
 
+    def test_asm_output(self):
+        """
+        Test that using --output ASM_FILENAME argument writes assembly
+        insturctions and symbol table to a file
+        """
+        testcase_file = "RAT24S_programs/add_sum.txt"
+        out_filename = "asm_output.txt"
+
+        # Raise error if testcase_file does not exist or out_filename exists
+        if not os.path.isfile(testcase_file):
+            raise ValueError(f"{testcase_file} not found")
+        if os.path.isfile(out_filename):
+            raise ValueError(f"{out_filename} already exists before testing")
+        
+        try:
+            # Run compiler
+            main(testcase_file, False, None, False, None, None, out_filename,
+                 None, supress_print=True)
+            
+            # Assert that out_filename exists
+            # No need to test for correctness, that is checked by
+            # TestAssemblyInstructions.test_write_asm_instructions
+            self.assertTrue(os.path.exists(out_filename),
+                            "Using --output or -o argument with compiler does not output a file with assembly instructions")
+        finally:
+            # Remove out_filename
+            if os.path.isfile(out_filename):
+                os.remove(out_filename)
+
 class TestAssemblyInstructions(unittest.TestCase):
     """Test that assembly instructions are generated correctly"""
     def test_write_asm_instructions(self):

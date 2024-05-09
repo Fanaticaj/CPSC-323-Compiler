@@ -20,7 +20,7 @@ def main(path, print_tokens, tokens_filename, print_prods, out_filename,
         utils.print_source_code(source_code)
         lexical_analyzer.print_tokens()
 
-    # Use recursive descent parser to check valid syntax
+    # Initialize recursive descent parser
     rdp_parser = RDP(lexical_analyzer, print_to_console=print_prods,
                      out_filename=out_filename)
 
@@ -35,6 +35,10 @@ def main(path, print_tokens, tokens_filename, print_prods, out_filename,
     # Write symbol table to a file if user included --symbol-table arg
     if sym_table_filename:
         rdp_parser.write_symbol_table(sym_table_filename)
+
+    # Write object coded to file if user used -o or --output arg
+    if asm_filename:
+        rdp_parser.write_asm_instructions(asm_filename)
 
     # Check if any arg was used
     used_arg = False
