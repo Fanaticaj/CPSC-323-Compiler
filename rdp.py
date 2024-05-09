@@ -23,7 +23,7 @@ class RDP:
     
   def token_is(self, token_type, token_val=None):
     """
-    Return True if next token type of next token in lexer is equal to token_type.
+    Return True if next token type of next token in lexer is equal recursive descent parserto token_type.
     Enter value for token_val if value of token matters ie. operators, separators, and keywords
     """
     next_token = self.lexer.get_next_token()
@@ -83,7 +83,22 @@ class RDP:
   def write_symbol_table(self, filename):
     """Write symbol table to a file"""
     self.symbol_table.write(filename)
-      
+
+  def write_asm_instructions(self, filename):
+    """
+    Write assembly instructions and symbol table to a file
+    """
+    # Write assembly instructions
+    with open(filename, 'w') as out_file:
+      for line_num, instruction in enumerate(self.asm_instructions):
+        out_file.write(f"{line_num:<5}{instruction}\n")
+
+      # Newline to separate instructions and symbol table
+      out_file.write('\n')
+
+    # Append symbol table
+    self.symbol_table.write(filename, append_to_file=True)
+
   def rat24s(self):
       """
       R1. <Rat24S> ::= $ <Opt Function Definitions> $ <Opt Declaration List> $ <Statement List> $

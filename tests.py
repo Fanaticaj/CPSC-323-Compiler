@@ -968,6 +968,50 @@ class TestSymbolTable(unittest.TestCase):
 
 class TestAssemblyInstructions(unittest.TestCase):
     """Test that assembly instructions are generated correctly"""
+    def test_write_asm_instructions(self):
+        """
+        Test that write_asm_instructions method correctly saves assembly
+        instructions to a file
+        """
+        out_filename = "myasm.txt"
+        if os.path.isfile(out_filename):
+            raise ValueError(f"{out_filename} already exists before running test")
+
+        try:
+            # Setup parser with instructions
+            source = "integer sum;sum = 0;"
+            l = Lexer(source)
+            parser = RDP(l)
+            # Run declaration_lsit first to update symbol table
+            parser.declaration_list()
+            # Run assign to update assembly instructions
+            parser.assign()
+
+            # Run write_asm_instructions method
+            parser.write_asm_instructions(out_filename)
+
+            # Assert out_filename exists
+            self.assertTrue(os.path.isfile(out_filename),
+                            f"{out_filename} not created by write_asm_instructions method")
+            
+            # Assert correct output
+            expected_output = [
+                '0    PUSHI 0',
+                '1    POPM 1',
+                '',
+                'Identifier          Memory Location     Type',
+                'sum                 1                   integer',
+                ''
+                ]
+
+            with open(out_filename) as f:
+                actual_output = f.read().split('\n')
+            self.assertEqual(actual_output, expected_output)
+        finally:
+            # Remove test file when done testing
+            if os.path.isfile(out_filename):
+                os.remove(out_filename)
+
     def test_assignment(self):
         """
         Test that correct assembly instructions are generated for assignment productions
