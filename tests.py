@@ -995,5 +995,32 @@ class TestAssemblyInstructions(unittest.TestCase):
         actual_instruction = parser.asm_instructions[1]
         self.assertEqual(actual_instruction, correct_instruction)
 
+    def test_multiple_assignment(self):
+        """
+        Test correct assembly instructions with multiple assignment statements
+        """
+        # Setup parser
+        source = "$$integer i,j,k;$i=0;k=2;j=23;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions length
+        correct_length = 6
+        actual_length = len(parser.asm_instructions)
+        self.assertEqual(actual_length, correct_length)
+
+        # Assert correct instructions
+        correct_instructions = [
+            "PUSHI 0",
+            "POPM 1",
+            "PUSHI 2",
+            "POPM 3",
+            "PUSHI 23",
+            "POPM 2"
+        ]
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, correct_instructions)
+
 if __name__ == "__main__":
     unittest.main()
