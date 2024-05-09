@@ -3,7 +3,7 @@ from lexer import Lexer
 from rdp import RDP
 
 def main(path, print_tokens, tokens_filename, print_prods, out_filename,
-         sym_table_filename, *, supress_print=False):
+         sym_table_filename, asm_filename, print_arg_help, *, supress_print=False):
     # Read source code
     with open(path, mode='r', encoding='utf-8-sig') as source_file:
         source_code = source_file.read()
@@ -35,12 +35,27 @@ def main(path, print_tokens, tokens_filename, print_prods, out_filename,
     # Write symbol table to a file if user included --symbol-table arg
     if sym_table_filename:
         rdp_parser.write_symbol_table(sym_table_filename)
-        
+
+    # Check if any arg was used
+    used_arg = False
+    if print_tokens:
+        used_arg = True
+    elif tokens_filename:
+        used_arg = True
+    elif print_prods:
+        used_arg = True
+    elif out_filename:
+        used_arg = True
+    elif sym_table_filename:
+        used_arg = True
+    elif asm_filename:
+        used_arg = True
+
     # Let user know how to save productions if no args passed
-    if not print_tokens and not tokens_filename and not print_prods and not out_filename and not sym_table_filename:
-        print("Note: Use --print-productions to print productions to console")
-        print("Use --save-productions=filename to save productions to a file")
-        
+    if not used_arg and not supress_print:
+        print()
+        print_arg_help()
+
 if __name__ == "__main__":
     args = utils.parse_arguments()
     main(*args)

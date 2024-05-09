@@ -32,12 +32,17 @@ def parse_arguments():
     arg_parser.add_argument('--symbol-table', action='store',
                             default=None, help="Save symbol table to a file")
     
+    # Arg to save assembly code and symbol table to a file
+    arg_parser.add_argument('-o', '--output', action='store',
+                            default=None, help="Save assembly code and symbol table to output file")
+
     # Parse command-line arguments
     path = Path(arg_parser.parse_args().source_code)
     print_tokens = arg_parser.parse_args().print_tokens
     tokens_filename = arg_parser.parse_args().save_tokens
     print_prods = arg_parser.parse_args().print_productions
-    out_filename = arg_parser.parse_args().save_productions
+    prods_filename = arg_parser.parse_args().save_productions
     sym_table_filename = arg_parser.parse_args().symbol_table
-    
-    return path, print_tokens, tokens_filename, print_prods, out_filename, sym_table_filename
+    asm_filename = arg_parser.parse_args().output
+
+    return path, print_tokens, tokens_filename, print_prods, prods_filename, sym_table_filename, asm_filename, arg_parser.print_help
