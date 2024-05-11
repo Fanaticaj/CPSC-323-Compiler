@@ -671,9 +671,9 @@ class RDP:
     R22. <While> ::= while ( <Condition> ) <Statement> endwhile
     """
     if self.token_is('keyword', 'while'):
-      self.finish_production_print("<While>")
-      self.print_production("<While> --> while ( <Condition> ) <Statement> endwhile")
       if not self.is_checking_recursive():
+        self.finish_production_print("<While>")
+        self.print_production("<While> --> while ( <Condition> ) <Statement> endwhile")
         self.asm_instructions.append('LABEL')
       if self.token_is('separator', '('):
         if self.condition():
