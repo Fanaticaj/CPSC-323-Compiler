@@ -699,10 +699,14 @@ class RDP:
 
     # Parse tokens
     if self.expression():
-      self.insert_PUSHM()
+      tok = self.lexer.get_prev_token()
+      if tok.type == 'identifier':
+        self.insert_PUSHM()
       if self.relop():
         if self.expression():
-          self.insert_PUSHM()
+          tok = self.lexer.get_prev_token()
+          if tok.type == 'identifier':
+            self.insert_PUSHM()
           self.swap_last_two_instructions()
           return True
     return False
