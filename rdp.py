@@ -11,13 +11,18 @@ class RDP:
     self.print_production_buffer = []
     self.asm_instructions = []
     self.symbol_table = SymbolTable()
-    # Make this attribute True when looking ahead
-    self.checking_recursive = False
+    # Stores which functions are checking for recursive functions
+    self.checking_recursive = {
+      'is_function_definitions_recursive': False,
+      'is_parameter_list_recursive' : False,
+      'is_IDs_recursive' : False,
+      'is_statement_list_recursive' : False
+    }
     # For use when testing a single production rule
     self.ignore_symbol_table = False
     
     # Clear out file if it is set
-    if self.out_filename and not self.checking_recursive:
+    if self.out_filename:
         with open(self.out_filename, 'w') as out_txt:
           out_txt.write("")
     
@@ -50,7 +55,7 @@ class RDP:
     elif self.print_to_console:
       print(prod)
         
-    if self.out_filename and not self.checking_recursive:
+    if self.out_filename and not self.is_checking_recursive():
       # Append to outfile here
       if not to_be_continued:
         self.append_to_file(prod)
@@ -60,19 +65,19 @@ class RDP:
     left_hand_side = ' '.join(self.print_production_buffer)
     self.print_production_buffer.clear()
     prod = f"{left_hand_side} {production}"
-    if self.print_to_console and not self.checking_recursive:
+    if self.print_to_console and not self.is_checking_recursive():
       print(prod)
     
-    if self.out_filename and not self.checking_recursive:
+    if self.out_filename and not self.is_checking_recursive():
       self.append_to_file(prod)
 
   def print_token(self, token):
     """Print token and append to file a token"""
     tok = f"Token: {token.type:15} Lexeme: {token.value}"
-    if self.print_to_console and not self.checking_recursive:
+    if self.print_to_console and not self.is_checking_recursive():
       print(tok)
       
-    if self.out_filename and not self.checking_recursive:
+    if self.out_filename and not self.is_checking_recursive():
       self.append_to_file(f"{tok}")
       
   def append_to_file(self, txt):
@@ -98,6 +103,15 @@ class RDP:
 
     # Append symbol table
     self.symbol_table.write(filename, append_to_file=True)
+
+  def is_checking_recursive(self):
+    """
+    Returns True if any function is checking for recursive functions, False otherwise
+    """
+    for func_name, bool in self.checking_recursive.items():
+      if bool == True:
+        return True
+    return False
 
   def rat24s(self):
       """
@@ -158,13 +172,13 @@ class RDP:
   
   def is_function_definitions_recursive(self):
     """Return True if function definitions includes more than one function, False otherwise"""
-    self.checking_recursive = True
+    self.checking_recursive['is_function_definitions_recursive'] = True
     curr = self.lexer.curr_token
     # Read first function
     self.function()
     is_recursive = self.function()
     self.lexer.curr_token = curr
-    self.checking_recursive = False
+    self.checking_recursive['is_function_definitions_recursive'] = False
     return is_recursive
   
   def function_definitions(self):
@@ -236,7 +250,7 @@ class RDP:
   
   def is_parameter_list_recursive(self):
     """Return True if <Parameter occurs more than once, False otherwise"""
-    self.checking_recursive = True
+    self.checking_recursive['is_parameter_list_recursive'] = True
     curr = self.lexer.curr_token
     # Read first function
     self.parameter()
@@ -246,7 +260,7 @@ class RDP:
     else:
       is_recursive = False
     self.lexer.curr_token = curr
-    self.checking_recursive = False
+    self.checking_recursive['is_parameter_list_recursive'] = False
     return is_recursive
   
   def parameter_list(self):
@@ -389,7 +403,7 @@ class RDP:
   
   def is_IDs_recursive(self):
     """Return True if there is more than one IDs, False otherwise"""
-    self.checking_recursive = True
+    self.checking_recursive['is_IDs_recursive'] = True
     curr = self.lexer.curr_token
     self.token_is('identifier')
     next_token = self.lexer.peek_next_token()
@@ -398,7 +412,7 @@ class RDP:
     else:
       is_recursive = False
     self.lexer.curr_token = curr
-    self.checking_recursive = False
+    self.checking_recursive['is_IDs_recursive'] = False
     return is_recursive
 
   def IDs(self):
@@ -432,12 +446,12 @@ class RDP:
         
   def is_statement_list_recursive(self):
     """Return True if statement occurs more than once, false otherwise"""
-    self.checking_recursive = True
+    self.checking_recursive['is_statement_list_recursive'] = True
     curr = self.lexer.curr_token
     self.statement()
     is_recursive = self.statement()
     self.lexer.curr_token = curr
-    self.checking_recursive = False
+    self.checking_recursive['is_statement_list_recursive'] = False
     return is_recursive
 
   def statement_list(self):
@@ -462,7 +476,7 @@ class RDP:
     """
     R14. <Statement> ::= <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
     """
-    if not self.checking_recursive:
+    if not self.is_checking_recursive():
       self.print_production("<Statement> -->", to_be_continued=True)
     if self.compound():
       return True
@@ -513,7 +527,7 @@ class RDP:
           if self.token_is('separator', ';'):
             # Add POPM instruction to asm_instructions
             # Get mem address of identifer
-            if assign_type == 'integer' and not self.ignore_symbol_table and not self.checking_recursive: # Temporary since only integers added to symbol table
+            if assign_type == 'integer' and not self.ignore_symbol_table and not self.is_checking_recursive(): # Temporary since only integers added to symbol table
               mem_address = self.symbol_table.get_mem_address(id_tok)
               self.asm_instructions.append(f"POPM {mem_address}")
             return True
@@ -618,11 +632,11 @@ class RDP:
     if self.token_is('keyword', 'scan'):
       self.finish_production_print("<Scan>")
       self.print_production("<Scan> --> scan ( <IDs> );")
-      if not self.checking_recursive:
+      if not self.is_checking_recursive():
         self.asm_instructions.append("SIN")
       if self.token_is('separator', '('):
         if self.IDs():
-          if not self.checking_recursive and not self.ignore_symbol_table:
+          if not self.is_checking_recursive() and not self.ignore_symbol_table:
             id_tok = self.lexer.get_prev_token()
             id_mem_address = self.symbol_table.get_mem_address(id_tok)
             self.asm_instructions.append(f"POPM {id_mem_address}")
@@ -774,7 +788,7 @@ class RDP:
     elif self.token_is('integer'):
       self.print_production('<Primary> --> <Integer>')
       int_tok = self.lexer.get_prev_token()
-      if int_tok and not self.checking_recursive:
+      if int_tok and not self.is_checking_recursive():
         int_val = int_tok.value
         self.asm_instructions.append(f"PUSHI {int_val}")
       return True
