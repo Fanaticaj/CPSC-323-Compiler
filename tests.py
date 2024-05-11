@@ -623,7 +623,7 @@ class TestRDP(unittest.TestCase):
 
         # Assert that count integer was inserted
         expected_symbols = {
-            Symbol(name='count', type='integer') : 5000
+            'count' : Symbol(mem_address=5000, type='integer')
             }
         self.assertEqual(parser.symbol_table.symbols, expected_symbols,
                          "Did not insert integer identifier to symbol table")
@@ -642,7 +642,7 @@ class TestRDP(unittest.TestCase):
 
         # Assert that boolean symbol was inserted
         expected_symbols = {
-            Symbol(name='is_cold', type='boolean') : 5000
+            'is_cold' : Symbol(mem_address=5000, type='boolean')
         }
 
         self.assertEqual(parser.symbol_table.symbols, expected_symbols,
@@ -668,12 +668,12 @@ class TestRDP(unittest.TestCase):
  
         # Assert symbols are in correct order
         expected_symbols = {
-            Symbol(name='i', type='integer') : 5000,
-            Symbol(name='j', type='integer') : 5001,
-            Symbol(name='k', type='integer') : 5002,
-            Symbol(name='l', type='boolean') : 5003,
-            Symbol(name='m', type='boolean') : 5004,
-            Symbol(name='n', type='boolean') : 5005,
+            'i' : Symbol(mem_address=5000, type='integer'),
+            'j' : Symbol(mem_address=5001, type='integer'),
+            'k' : Symbol(mem_address=5002, type='integer'),
+            'l' : Symbol(mem_address=5003, type='boolean'),
+            'm' : Symbol(mem_address=5004, type='boolean'),
+            'n' : Symbol(mem_address=5005, type='boolean'),
         }
 
         self.assertEqual(parser.symbol_table.symbols,  expected_symbols)
@@ -697,8 +697,8 @@ class TestSymbolTable(unittest.TestCase):
         symbol_table = SymbolTable()
         symbol_table.insert(id_tok, sym_type)
 
-        self.assertTrue(symbol_table.exists_identifier(id_tok, sym_type))
-        self.assertFalse(symbol_table.exists_identifier(id_tok2, sym_type))
+        self.assertTrue(symbol_table.exists_identifier(id_tok))
+        self.assertFalse(symbol_table.exists_identifier(id_tok2))
 
     def test_insert_symbol(self):
         """Test inserting a symbol to the symbol table"""
@@ -712,7 +712,7 @@ class TestSymbolTable(unittest.TestCase):
 
         # Assett symbol as added to symbol table
         expected_symbol_table = {
-            Symbol(name='count', type='integer') : 5000
+            'count' : Symbol(mem_address=5000, type='integer')
             }
         self.assertEqual(symbol_table.symbols, expected_symbol_table)
 
@@ -734,31 +734,6 @@ class TestSymbolTable(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             symbol_table.insert(id_tok2, sym_type)
-
-    def test_same_name_diff_type_entry(self):
-        """
-        Test that identifiers of the same name but different type can be 
-        inserted to the symbol table
-        """
-        id_tok = Token('identifier', 'count')
-        id_type = 'integer'
-        id2_tok = Token('identifier', 'count')
-        id2_type = 'identifier'
-
-        symbol_table = SymbolTable()
-        
-        # Insert first identifier
-        symbol_table.insert(id_tok, id_type)
-
-        # Insert second identifier
-        symbol_table.insert(id2_tok, id2_type)
-
-        expected_symbols = {
-            Symbol(name='count', type='integer'): 5000,
-            Symbol(name='count', type='identifier'): 5001
-            }
-        
-        self.assertEqual(symbol_table.symbols, expected_symbols)
 
     def test_write(self):
         """
@@ -881,8 +856,8 @@ class TestSymbolTable(unittest.TestCase):
         symbol_table.insert(id2_tok, id2_type)
 
         # Assert correct address is returned
-        self.assertEqual(symbol_table.get_mem_address(id2_tok, id2_type), id2_addr)
-        self.assertEqual(symbol_table.get_mem_address(id_tok, id_type), id_addr)
+        self.assertEqual(symbol_table.get_mem_address(id2_tok), id2_addr)
+        self.assertEqual(symbol_table.get_mem_address(id_tok), id_addr)
 
 class TestCompiler(unittest.TestCase):
     """
