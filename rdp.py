@@ -618,8 +618,14 @@ class RDP:
     if self.token_is('keyword', 'scan'):
       self.finish_production_print("<Scan>")
       self.print_production("<Scan> --> scan ( <IDs> );")
+      if not self.checking_recursive:
+        self.asm_instructions.append("SIN")
       if self.token_is('separator', '('):
         if self.IDs():
+          if not self.checking_recursive and not self.ignore_symbol_table:
+            id_tok = self.lexer.get_prev_token()
+            id_mem_address = self.symbol_table.get_mem_address(id_tok)
+            self.asm_instructions.append(f"POPM {id_mem_address}")
           if self.token_is('separator', ')'):
             if self.token_is('separator', ';'):
               return True

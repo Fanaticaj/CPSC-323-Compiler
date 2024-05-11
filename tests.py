@@ -401,6 +401,7 @@ class TestRDP(unittest.TestCase):
         if_statement = 'if ( 3 < 1 ) { scan (myvar); } endif'
         l = Lexer(if_statement)
         parser = RDP(l)
+        parser.ignore_symbol_table = True
         is_If = parser.If()
         self.assertTrue(is_If, f"Not recognized as If: {if_statement}")
         self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {if_statement}")
@@ -417,6 +418,7 @@ class TestRDP(unittest.TestCase):
         for if_prime in if_primes:
             l = Lexer(if_prime)
             parser = RDP(l)
+            parser.ignore_symbol_table = True
             is_If_prime = parser.If_prime()
             self.assertTrue(is_If_prime, f"Not recognized as If_prime: {if_prime}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {if_prime}")
@@ -455,6 +457,7 @@ class TestRDP(unittest.TestCase):
         source = "scan (var123);"
         l = Lexer(source)
         parser = RDP(l)
+        parser.ignore_symbol_table = True
         is_scan = parser.scan()
         self.assertTrue(is_scan, f"Not recognized as scan: {source}")
         self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {source}")
@@ -1074,6 +1077,49 @@ class TestAssemblyInstructions(unittest.TestCase):
         ]
         actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, correct_instructions)
+
+    def test_scan(self):
+        """
+        Test that scan statements generate correct assembly code.
+        scan (max);
+
+        SIN
+        POPM 5001
+        """
+        # Setup parser
+        source = "integer max;scan (max);"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.declaration_list()
+        parser.scan()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'SIN',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_scan_rat24s(self):
+        """Test that scan works with actual RAT24S program"""
+        # Setup parser
+        source = "$$integer i,j;$scan(i);scan(j);$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'SIN',
+            'POPM 5000',
+            'SIN',
+            'POPM 5001'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
 
 if __name__ == "__main__":
     unittest.main()
