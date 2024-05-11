@@ -1121,5 +1121,22 @@ class TestAssemblyInstructions(unittest.TestCase):
         actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, expected_instructions)
 
+    def test_while(self):
+        """
+        Test that while statements generate LABEL instruction
+        """
+        # Setup Parser
+        source = "while ( 3 < 1 ) { scan (myvar); } endwhile"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.ignore_symbol_table = True
+        parser.While()
+
+        # Assert correct instructions
+        expected_instructions = ['LABEL']
+        # Only get first instruction
+        actual_instructions = parser.asm_instructions[:1]
+        self.assertEqual(actual_instructions, expected_instructions)
+
 if __name__ == "__main__":
     unittest.main()
