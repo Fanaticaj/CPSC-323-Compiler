@@ -476,12 +476,12 @@ class RDP:
         
   def is_statement_list_recursive(self):
     """Return True if statement occurs more than once, false otherwise"""
-    self.checking_recursive['is_statement_list_recursive'] = True
     curr = self.lexer.curr_token
+    self.checking_recursive[f'is_statement_list_recursive{curr}'] = True
     self.statement()
     is_recursive = self.statement()
     self.lexer.curr_token = curr
-    self.checking_recursive['is_statement_list_recursive'] = False
+    self.checking_recursive[f'is_statement_list_recursive{curr}'] = False
     return is_recursive
 
   def statement_list(self):
