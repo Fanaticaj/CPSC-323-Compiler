@@ -13,7 +13,7 @@ class SymbolTable:
   def __init__(self):
     # Initialize memory address at 1
     # mem_address is the memory address that will be assigned to next new symbol
-    self.mem_address = 1
+    self.mem_address = 5000
     # symbols dictionary to store all identifiers
     # Key: Symbol(name, type)
     # Value: memory address

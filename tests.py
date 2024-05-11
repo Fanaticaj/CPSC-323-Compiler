@@ -623,7 +623,7 @@ class TestRDP(unittest.TestCase):
 
         # Assert that count integer was inserted
         expected_symbols = {
-            Symbol(name='count', type='integer') : 1
+            Symbol(name='count', type='integer') : 5000
             }
         self.assertEqual(parser.symbol_table.symbols, expected_symbols,
                          "Did not insert integer identifier to symbol table")
@@ -642,7 +642,7 @@ class TestRDP(unittest.TestCase):
 
         # Assert that boolean symbol was inserted
         expected_symbols = {
-            Symbol(name='is_cold', type='boolean') : 1
+            Symbol(name='is_cold', type='boolean') : 5000
         }
 
         self.assertEqual(parser.symbol_table.symbols, expected_symbols,
@@ -668,12 +668,12 @@ class TestRDP(unittest.TestCase):
  
         # Assert symbols are in correct order
         expected_symbols = {
-            Symbol(name='i', type='integer') : 1,
-            Symbol(name='j', type='integer') : 2,
-            Symbol(name='k', type='integer') : 3,
-            Symbol(name='l', type='boolean') : 4,
-            Symbol(name='m', type='boolean') : 5,
-            Symbol(name='n', type='boolean') : 6,
+            Symbol(name='i', type='integer') : 5000,
+            Symbol(name='j', type='integer') : 5001,
+            Symbol(name='k', type='integer') : 5002,
+            Symbol(name='l', type='boolean') : 5003,
+            Symbol(name='m', type='boolean') : 5004,
+            Symbol(name='n', type='boolean') : 5005,
         }
 
         self.assertEqual(parser.symbol_table.symbols,  expected_symbols)
@@ -681,8 +681,8 @@ class TestRDP(unittest.TestCase):
 class TestSymbolTable(unittest.TestCase):
     """Test Symbol table methods"""
     def test_initial_mem_address(self):
-        """Test that memory address starts at 1"""
-        init_mem_address = 1
+        """Test that memory address starts at 5000"""
+        init_mem_address = 5000
         symbol_table = SymbolTable()
         self.assertEqual(symbol_table.mem_address, init_mem_address)
 
@@ -712,12 +712,12 @@ class TestSymbolTable(unittest.TestCase):
 
         # Assett symbol as added to symbol table
         expected_symbol_table = {
-            Symbol(name='count', type='integer') : 1
+            Symbol(name='count', type='integer') : 5000
             }
         self.assertEqual(symbol_table.symbols, expected_symbol_table)
 
         # Assert memory address was increased
-        expected_mem_address = 2
+        expected_mem_address = 5001
         self.assertEqual(symbol_table.mem_address, expected_mem_address)
 
     def test_duplicate_err(self):
@@ -754,8 +754,8 @@ class TestSymbolTable(unittest.TestCase):
         symbol_table.insert(id2_tok, id2_type)
 
         expected_symbols = {
-            Symbol(name='count', type='integer'): 1,
-            Symbol(name='count', type='identifier'): 2
+            Symbol(name='count', type='integer'): 5000,
+            Symbol(name='count', type='identifier'): 5001
             }
         
         self.assertEqual(symbol_table.symbols, expected_symbols)
@@ -795,9 +795,9 @@ class TestSymbolTable(unittest.TestCase):
 
             expected_output_arr = [
                 'Identifier', 'Memory', 'Location', 'Type',
-                'i', '1', 'integer',
-                'max', '2', 'integer',
-                'sum', '3', 'integer'
+                'i', '5000', 'integer',
+                'max', '5001', 'integer',
+                'sum', '5002', 'integer'
                 ]
             
             self.maxDiff = None
@@ -838,7 +838,7 @@ class TestSymbolTable(unittest.TestCase):
             expected_output = [
                 'testing123...',
                 'Identifier', 'Memory', 'Location', 'Type',
-                'count', '1', 'integer'
+                'count', '5000', 'integer'
                 ]
             
             self.assertEqual(output_file, expected_output,
@@ -872,10 +872,10 @@ class TestSymbolTable(unittest.TestCase):
         # Setup symbol table
         id_tok = Token('identifier', 'count')
         id_type = 'integer'
-        id_addr = 1
+        id_addr = 5000
         id2_tok = Token('identifier', 'isfull')
         id2_type = 'boolean'
-        id2_addr = 2
+        id2_addr = 5001
         symbol_table = SymbolTable()
         symbol_table.insert(id_tok, id_type)
         symbol_table.insert(id2_tok, id2_type)
@@ -958,12 +958,12 @@ class TestCompiler(unittest.TestCase):
                 res = out_txt.read().split()
             expected_res = [
                 'Identifier', 'Memory', 'Location', 'Type',
-                'i', '1', 'integer',
-                'max', '2', 'integer',
-                'sum', '3', 'integer',
-                'j', '4', 'boolean',
-                'k', '5', 'boolean',
-                'l', '6', 'boolean'
+                'i', '5000', 'integer',
+                'max', '5001', 'integer',
+                'sum', '5002', 'integer',
+                'j', '5003', 'boolean',
+                'k', '5004', 'boolean',
+                'l', '5005', 'boolean'
                 ]
 
             self.assertEqual(res, expected_res)
@@ -1031,10 +1031,10 @@ class TestAssemblyInstructions(unittest.TestCase):
             # Assert correct output
             expected_output = [
                 '1    PUSHI 0',
-                '2    POPM 1',
+                '2    POPM 5000',
                 '',
                 'Identifier          Memory Location     Type',
-                'sum                 1                   integer',
+                'sum                 5000                integer',
                 ''
                 ]
 
@@ -1051,8 +1051,8 @@ class TestAssemblyInstructions(unittest.TestCase):
         Test that correct assembly instructions are generated for assignment productions
         sum = 0;
         Should generate:
-        1 PUSHI 0
-        2 POPM 1
+        5000 PUSHI 0
+        5000 POPM 1
         """
         # Run parser with source code
         source = "integer sum;sum = 0;"
@@ -1069,7 +1069,7 @@ class TestAssemblyInstructions(unittest.TestCase):
         self.assertEqual(actual_instruction, correct_instruction)
 
         # Assert second instruction is: POPM 1
-        correct_instruction = "POPM 1"
+        correct_instruction = "POPM 5000"
         actual_instruction = parser.asm_instructions[1]
         self.assertEqual(actual_instruction, correct_instruction)
 
@@ -1091,11 +1091,11 @@ class TestAssemblyInstructions(unittest.TestCase):
         # Assert correct instructions
         correct_instructions = [
             "PUSHI 0",
-            "POPM 1",
+            "POPM 5000",
             "PUSHI 2",
-            "POPM 3",
+            "POPM 5002",
             "PUSHI 23",
-            "POPM 2"
+            "POPM 5001"
         ]
         actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, correct_instructions)
