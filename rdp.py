@@ -715,9 +715,13 @@ class RDP:
     next_token = self.lexer.peek_next_token()
     if self.token_is('operator') and next_token.value in operators:
       self.print_production(f"<Relop> --> {next_token.value}")
-      op = self.lexer.get_prev_token()
-      if op.value == '<':
-        self.asm_instructions.append('LES')
+      if not self.is_checking_recursive():
+        # Get operator value
+        op = self.lexer.get_prev_token().value
+
+        # Insert LES instruction for < operator
+        if op == '<':
+          self.asm_instructions.append('LES')
       return True
     else:
       self.lexer.backtrack()
