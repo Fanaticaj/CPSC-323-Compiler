@@ -49,35 +49,44 @@ class RDP:
   
   def print_production(self, production, *, to_be_continued=False):
     """Print and append to file the current production"""
+    if self.is_checking_recursive():
+      return
+
     prod = f"{'':2}{production}"
     if to_be_continued:
       self.print_production_buffer.append(prod)
     elif self.print_to_console:
       print(prod)
         
-    if self.out_filename and not self.is_checking_recursive():
+    if self.out_filename:
       # Append to outfile here
       if not to_be_continued:
         self.append_to_file(prod)
         
   def finish_production_print(self, production):
     """Print the right hand side of a production that was started but not finished"""
+    if self.is_checking_recursive():
+      return
+
     left_hand_side = ' '.join(self.print_production_buffer)
     self.print_production_buffer.clear()
     prod = f"{left_hand_side} {production}"
-    if self.print_to_console and not self.is_checking_recursive():
+    if self.print_to_console:
       print(prod)
     
-    if self.out_filename and not self.is_checking_recursive():
+    if self.out_filename:
       self.append_to_file(prod)
 
   def print_token(self, token):
     """Print token and append to file a token"""
+    if self.is_checking_recursive():
+      return
+
     tok = f"Token: {token.type:15} Lexeme: {token.value}"
-    if self.print_to_console and not self.is_checking_recursive():
+    if self.print_to_console:
       print(tok)
       
-    if self.out_filename and not self.is_checking_recursive():
+    if self.out_filename:
       self.append_to_file(f"{tok}")
       
   def append_to_file(self, txt):
