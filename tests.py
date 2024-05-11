@@ -346,6 +346,7 @@ class TestRDP(unittest.TestCase):
         for statement_list in statement_lists:
             l = Lexer(statement_list)
             parser = RDP(l)
+            parser.ignore_symbol_table = True
             is_statement_list = parser.statement_list()
             self.assertTrue(is_statement_list, f"Not recognized as Statement List: {statement_list}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {statement_list}")
@@ -469,6 +470,7 @@ class TestRDP(unittest.TestCase):
         source = "while (3 < 1) return; endwhile"
         l = Lexer(source)
         parser = RDP(l)
+        parser.ignore_symbol_table = True
         is_while = parser.While()
         self.assertTrue(is_while, f"Not recognized as while: {source}")
         self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {source}")
@@ -482,6 +484,7 @@ class TestRDP(unittest.TestCase):
             condition = f"3 {op} 1"
             l = Lexer(condition)
             parser = RDP(l)
+            parser.ignore_symbol_table = True
             is_condition = parser.condition()
             self.assertTrue(is_condition, f"Not recognized as condition: {condition}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {operators}")
@@ -1136,6 +1139,32 @@ class TestAssemblyInstructions(unittest.TestCase):
         expected_instructions = ['LABEL']
         # Only get first instruction
         actual_instructions = parser.asm_instructions[:1]
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_less_than(self):
+        """
+        Test that less than conditions generate correct instructions
+        i < max
+
+        PUSHM 5000
+        PUSHM 5001
+        LES
+        """
+        # Setup parser
+        source = "integer i, max;i < max"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.declaration_list()
+        parser.condition()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'PUSHM 5000',
+            'PUSHM 5001',
+            'LES'
+        ]
+
+        actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, expected_instructions)
 
 if __name__ == "__main__":

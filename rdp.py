@@ -112,6 +112,27 @@ class RDP:
       if bool == True:
         return True
     return False
+  
+  def swap_last_two_instructions(self):
+    """Swap the last two instructions in self.asm_instructions"""
+    # Check that there are at least two instructions
+    if self.ignore_symbol_table or self.is_checking_recursive():
+      return
+
+    if len(self.asm_instructions) < 2:
+      raise ValueError("Cannot swap instructions because there less than 2")
+
+    last = self.asm_instructions[-1]
+    second = self.asm_instructions[-2]
+    self.asm_instructions[-1] = second
+    self.asm_instructions[-2] = last
+
+  def insert_PUSHM(self):
+    """Insert PUSHM instruction"""
+    if not self.is_checking_recursive() and not self.ignore_symbol_table:
+      prev_tok = self.lexer.get_prev_token()
+      mem_address = self.symbol_table.get_mem_address(prev_tok)
+      self.asm_instructions.append(f"PUSHM {mem_address}")
 
   def rat24s(self):
       """
@@ -678,8 +699,11 @@ class RDP:
 
     # Parse tokens
     if self.expression():
+      self.insert_PUSHM()
       if self.relop():
         if self.expression():
+          self.insert_PUSHM()
+          self.swap_last_two_instructions()
           return True
     return False
   
@@ -691,6 +715,9 @@ class RDP:
     next_token = self.lexer.peek_next_token()
     if self.token_is('operator') and next_token.value in operators:
       self.print_production(f"<Relop> --> {next_token.value}")
+      op = self.lexer.get_prev_token()
+      if op.value == '<':
+        self.asm_instructions.append('LES')
       return True
     else:
       self.lexer.backtrack()
