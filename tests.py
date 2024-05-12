@@ -512,6 +512,7 @@ class TestRDP(unittest.TestCase):
         for exp in expressions:
             l = Lexer(exp)
             parser = RDP(l)
+            parser.ignore_symbol_table = True
             is_exp = parser.expression()
             self.assertTrue(is_exp, f"Not recognized as expression: {exp}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {exp}")
@@ -528,6 +529,7 @@ class TestRDP(unittest.TestCase):
         for t in tests:
             l = Lexer(t)
             parser = RDP(l)
+            parser.ignore_symbol_table = True
             is_expression_prime = parser.expression_prime()
             self.assertTrue(is_expression_prime, f"Not recognized as expression prime: {t}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {t}")
@@ -600,6 +602,7 @@ class TestRDP(unittest.TestCase):
         for p in primaries:
             l = Lexer(p)
             parser = RDP(l)
+            parser.ignore_symbol_table = True
             is_primary = parser.primary()
             self.assertTrue(is_primary, f"Not recognized as primary: {p}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {p}")
@@ -1190,6 +1193,32 @@ class TestAssemblyInstructions(unittest.TestCase):
             'PUSHM 5001',
             'LES',
             'JUMP0 UNDEFINED'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_addition(self):
+        """
+        Test that correct instructions are generated for addition
+        i = i + 1
+        PUSHM 5000
+        PUSHI 1
+        A
+        POPM 5000
+        """
+        # Setup parser
+        source = "$$integer i;$i=i+1;$"
+        l = Lexer(source)
+        parser = RDP (l)
+        parser.rat24s()
+
+        # Assert correct instruction generated
+        expected_instructions = [
+            'PUSHM 5000',
+            'PUSHI 1',
+            'A',
+            'POPM 5000'
         ]
 
         actual_instructions = parser.asm_instructions

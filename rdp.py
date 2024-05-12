@@ -792,7 +792,16 @@ class RDP:
     """
     if self.token_is('operator', '+'):
       self.print_production("<Expression_prime> --> + <Term> <Expression_prime>")
+      if not self.is_checking_recursive() and not self.ignore_symbol_table:
+        tok = self.lexer.tokens[self.lexer.curr_token - 2]
+        if tok and tok.type == 'identifier':
+          mem_address = self.symbol_table.get_mem_address(tok)
+          self.asm_instructions.append(f"PUSHM {mem_address}")
+          self.asm_instructions.append('A')
       if self.term():
+        if not self.is_checking_recursive() and not self.ignore_symbol_table:
+          tok = self.lexer.get_prev_token()
+          self.swap_last_two_instructions()
         if self.expression_prime():
           return True
       return False
