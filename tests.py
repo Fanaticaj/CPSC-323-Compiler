@@ -198,6 +198,7 @@ class TestRDP(unittest.TestCase):
         for func in funcs:
             l = Lexer(func)
             parser = RDP(l)
+            parser.ignore_symbol_table = True
             is_func = parser.function()
             self.assertTrue(is_func, f"Not recognized as a function: {func}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {func}")
@@ -547,6 +548,7 @@ class TestRDP(unittest.TestCase):
         for term in terms:
             l = Lexer(term)
             parser = RDP(l)
+            parser.ignore_symbol_table = True
             is_term = parser.term()
             self.assertTrue(is_term, f"Not recognized as term: {term}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {term}")
@@ -565,6 +567,7 @@ class TestRDP(unittest.TestCase):
         for tp in term_primes:
             l = Lexer(tp)
             parser = RDP(l)
+            parser.ignore_symbol_table = True
             is_term_prime = parser.term_prime()
             self.assertTrue(is_term_prime, f"Not recognized as term prime: {tp}")
             self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {tp}")
@@ -1372,6 +1375,69 @@ class TestAssemblyInstructions(unittest.TestCase):
             'PUSHM 5001',
             'PUSHM 5002',
             'S',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_multiplication(self):
+        """
+        Test that multiplication generates correct instructions
+        """
+        # Setup parser
+        source = "$$integer prod,i;$prod = 4 * i;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions generated
+        expected_instructions = [
+            'PUSHI 4',
+            'PUSHM 5001',
+            'M',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_multiplication_integers(self):
+        """
+        Test that multiplication of integers generates correct instructions
+        """
+        # Setup parser
+        source = "$$integer prod;$prod = 2 * 3;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions generated
+        expected_instructions = [
+            'PUSHI 2',
+            'PUSHI 3',
+            'M',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_multiplication_ids(self):
+        """
+        Test that multiplication of identifiers generates correct instructions
+        """
+        # Setup parser
+        source = "$$integer prod,i,j;$prod = i * j;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions generated
+        expected_instructions = [
+            'PUSHM 5001',
+            'PUSHM 5002',
+            'M',
             'POPM 5000'
         ]
 

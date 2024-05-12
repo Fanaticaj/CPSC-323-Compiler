@@ -788,6 +788,25 @@ class RDP:
       if self.expression_prime():
         return True
     return False
+  
+  def insert_id_pushm_second(self):
+    """
+    Insert a PUSHM instruction for identifiers when the identifier is
+    the first of two primaries
+    """
+    tok = self.lexer.tokens[self.lexer.curr_token - 2]
+    if tok and tok.type == 'identifier':
+      mem_address = self.symbol_table.get_mem_address(tok)
+      self.asm_instructions.append(f"PUSHM {mem_address}")
+
+  def insert_id_pushm_first(self):
+    """
+    Insert PUSHM instruction when identifier is previous token
+    """
+    tok = self.lexer.get_prev_token()
+    if tok and tok.type == 'identifier':
+      mem_address = self.symbol_table.get_mem_address(tok)
+      self.asm_instructions.append(f'PUSHM {mem_address}')
 
   def expression_prime(self):
     """
@@ -796,17 +815,11 @@ class RDP:
     if self.token_is('operator', '+'):
       self.print_production("<Expression_prime> --> + <Term> <Expression_prime>")
       if not self.is_checking_recursive() and not self.ignore_symbol_table:
-        tok = self.lexer.tokens[self.lexer.curr_token - 2]
-        if tok and tok.type == 'identifier':
-          mem_address = self.symbol_table.get_mem_address(tok)
-          self.asm_instructions.append(f"PUSHM {mem_address}")
+        self.insert_id_pushm_second()
         self.asm_instructions.append('A')
       if self.term():
         if not self.is_checking_recursive() and not self.ignore_symbol_table:
-          tok = self.lexer.get_prev_token()
-          if tok and tok.type == 'identifier':
-            mem_address = self.symbol_table.get_mem_address(tok)
-            self.asm_instructions.append(f'PUSHM {mem_address}')
+          self.insert_id_pushm_first()
           self.swap_last_two_instructions()
         if self.expression_prime():
           return True
@@ -814,16 +827,10 @@ class RDP:
     elif self.token_is('operator', '-'):
       self.print_production("<Expression_prime> --> - <Term> <Expression_prime>")
       if not self.is_checking_recursive() and not self.ignore_symbol_table:
-        tok = self.lexer.tokens[self.lexer.curr_token - 2]
-        if tok and tok.type == 'identifier':
-          mem_address = self.symbol_table.get_mem_address(tok)
-          self.asm_instructions.append(f"PUSHM {mem_address}")
+        self.insert_id_pushm_second()
       if self.term():
         if not self.is_checking_recursive() and not self.ignore_symbol_table:
-          tok = self.lexer.get_prev_token()
-          if tok and tok.type == 'identifier':
-            mem_address = self.symbol_table.get_mem_address(tok)
-            self.asm_instructions.append(f'PUSHM {mem_address}')
+          self.insert_id_pushm_first()
         if self.expression_prime():
           if not self.is_checking_recursive() and not self.ignore_symbol_table:
             self.asm_instructions.append('S')
@@ -850,8 +857,13 @@ class RDP:
     """
     if self.token_is('operator', '*'):
       self.print_production("<Term_prime> --> * <Factor> <Term_prime>")
+      if not self.is_checking_recursive() and not self.ignore_symbol_table:
+        self.insert_id_pushm_second()
       if self.factor():
         if self.term_prime():
+          if not self.is_checking_recursive() and not self.ignore_symbol_table:
+            self.insert_id_pushm_first()
+            self.asm_instructions.append('M')
           return True
       return False
     elif self.token_is('operator', '/'):
