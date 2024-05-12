@@ -22,6 +22,7 @@ class RDP:
     self.ignore_symbol_table = False
     self.in_declaration_list = False
     self.in_scan = False
+    self.in_print = False
     
     # Clear out file if it is set
     if self.out_filename:
@@ -665,6 +666,7 @@ class RDP:
     """
     R20. <Print> ::= print ( <Expression>);
     """
+    self.in_print = True
     if self.token_is('keyword', 'print'):
       self.finish_production_print("<Print>")
       self.print_production("<Print> --> print ( <Expression>);")
@@ -674,15 +676,10 @@ class RDP:
             if self.token_is('separator', ';'):
               if not self.is_checking_recursive():
                 self.asm_instructions.append('SOUT')
+              self.in_print = False
               return True
-            else:
-              return False
-        else:
-          return False
-      else:
-        return False
-    else:
-      return False
+    self.in_print = False
+    return False
   
   def scan(self):
     """
@@ -848,6 +845,8 @@ class RDP:
     Insert a PUSHM instruction for identifiers when the identifier is
     the first of two primaries
     """
+    if self.in_print:
+      return
     tok = self.lexer.tokens[self.lexer.curr_token - 2]
     if tok and tok.type == 'identifier':
       if not self.symbol_table.exists_identifier(tok):
@@ -862,6 +861,8 @@ class RDP:
     """
     Insert PUSHM instruction when identifier is previous token
     """
+    if self.in_print:
+      return
     tok = self.lexer.get_prev_token()
     if tok and tok.type == 'identifier':
       if not self.symbol_table.exists_identifier(tok):
@@ -974,6 +975,15 @@ class RDP:
         return False
       else:      
         self.print_production('<Primary> --> <Identifier>')
+        if not self.is_checking_recursive() and not self.ignore_symbol_table and self.in_print:
+          prev_tok = self.lexer.get_prev_token()
+          if not self.symbol_table.exists_identifier(prev_tok):
+            err_msg = f"Error: Identifier {prev_tok.value} was not declared"
+            self.print_production(err_msg)
+            self.asm_instructions.append(err_msg)
+            return False
+          mem_address = self.symbol_table.get_mem_address(prev_tok)
+          self.asm_instructions.append(f"PUSHM {mem_address}")
         return True
     elif self.token_is('integer'):
       self.print_production('<Primary> --> <Integer>')
