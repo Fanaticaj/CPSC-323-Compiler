@@ -1124,7 +1124,7 @@ class TestAssemblyInstructions(unittest.TestCase):
         actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, expected_instructions)
 
-    def test_while(self):
+    def test_while_label(self):
         """
         Test that while statements generate LABEL instruction
         """
@@ -1139,6 +1139,33 @@ class TestAssemblyInstructions(unittest.TestCase):
         expected_instructions = ['LABEL']
         # Only get first instruction
         actual_instructions = parser.asm_instructions[:1]
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_while_jump0(self):
+        """
+        Test that while loops generate JUMP0 instuction with correct
+        line number
+        """
+        # Setup parser
+        source = "$$integer i;$while(i < 0){return;}endwhile\ni=0;"
+        l = Lexer(source)
+        parser = RDP(l)
+        #parser.print_to_console = True
+        parser.rat24s()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'LABEL',
+            'PUSHM 5000',
+            'PUSHI 0',
+            'LES',
+            'JUMP0 7',
+            'Jump 1',
+            'PUSHI 0',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, expected_instructions)
 
     def test_less_than(self):
@@ -1161,7 +1188,8 @@ class TestAssemblyInstructions(unittest.TestCase):
         expected_instructions = [
             'PUSHM 5000',
             'PUSHM 5001',
-            'LES'
+            'LES',
+            'JUMP0 UNDEFINED'
         ]
 
         actual_instructions = parser.asm_instructions

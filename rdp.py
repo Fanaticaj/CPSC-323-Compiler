@@ -674,7 +674,35 @@ class RDP:
             if self.token_is('separator', ';'):
               return True
     return False
- 
+  
+  def get_prev_label_line_num(self):
+    """
+    Return line number of the most recent label in instructions list
+    """
+    line_count = len(self.asm_instructions)
+    last_label = None
+    for instruction in self.asm_instructions[::-1]:
+      if instruction == 'LABEL':
+        last_label = line_count
+        break
+      line_count -= 1
+    return last_label
+  
+  def update_prev_JUMP0_line_num(self):
+    """
+    Update the previous JUMP0 instruction so that it points to the next line number
+    """
+    # Update last JUMP0 line number to next line number
+    next_line_num = len(self.asm_instructions) + 1
+    line_count = len(self.asm_instructions) - 1
+    while line_count >= 0:
+      curr_instruction = self.asm_instructions[line_count]
+      if curr_instruction == "JUMP0 UNDEFINED":
+        self.asm_instructions[line_count] = f"JUMP0 {next_line_num}"
+        break
+      line_count -= 1
+
+  
   def While(self):
     """
     R22. <While> ::= while ( <Condition> ) <Statement> endwhile
@@ -689,6 +717,12 @@ class RDP:
           if self.token_is('separator', ')'):
             if self.statement():
               if self.token_is('keyword', 'endwhile'):
+                # Generate instruction to jump back to start of while loop
+                if not self.is_checking_recursive():
+                  label_line_num = self.get_prev_label_line_num()
+                  self.asm_instructions.append(f"Jump {label_line_num}")
+                  # Update JUMP0 line number
+                  self.update_prev_JUMP0_line_num()
                 return True
     return False
 
@@ -717,6 +751,8 @@ class RDP:
           if tok.type == 'identifier':
             self.insert_PUSHM()
           self.swap_last_two_instructions()
+          if not self.is_checking_recursive():
+            self.asm_instructions.append('JUMP0 UNDEFINED')
           return True
     return False
   
