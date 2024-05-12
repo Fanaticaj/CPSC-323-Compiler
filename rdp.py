@@ -20,6 +20,7 @@ class RDP:
     }
     # For use when testing a single production rule
     self.ignore_symbol_table = False
+    self.in_declaration_list = False
     
     # Clear out file if it is set
     if self.out_filename:
@@ -386,12 +387,14 @@ class RDP:
       """
       R10. <Declaration List> := <Declaration> ; | <Declaration> ; <Declaration List>
       """
+      self.in_declaration_list = True
       FIRST = set(['integer', 'boolean', 'real'])
       next_token = self.lexer.peek_next_token()
       if next_token and next_token.value in FIRST:
         self.print_production("<Declaration List> := <Declaration> ; | <Declaration> ; <Declaration List>")
       # Attempt the first declaration.
       if not self.declaration():
+          self.in_declaration_list = False
           return False
 
       # After a successful declaration, expect a semicolon.
@@ -404,7 +407,7 @@ class RDP:
           else:
               # If the next token isn't a semicolon, we've exited the declaration list properly.
               break
-      
+      self.in_declaration_list = False
       return True
   
   def declaration(self):
@@ -461,8 +464,9 @@ class RDP:
         if self.token_is('identifier'):
           # Insert to symbol table with type None (will be updated with last 
           # symbol in declaration list)
-          prev_tok = self.lexer.get_prev_token()
-          self.symbol_table.insert(prev_tok, None)
+          if self.in_declaration_list:
+            prev_tok = self.lexer.get_prev_token()
+            self.symbol_table.insert(prev_tok, None)
           if self.token_is('separator', ','):
             if self.IDs():
               return True
