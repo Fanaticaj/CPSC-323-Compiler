@@ -1227,6 +1227,31 @@ class TestAssemblyInstructions(unittest.TestCase):
         actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, expected_instructions)
 
+    def test_equal_to(self):
+        """
+        Test that equal to conditions generate correct instructions
+        """
+        # Setup parser
+        source = "$$integer i, max;$while(i == max) {return;}endwhile\nprint(1);$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'LABEL',
+            'PUSHM 5000',
+            'PUSHM 5001',
+            'EQU',
+            'JUMP0 7',
+            'JUMP 1',
+            'PUSHI 1',
+            'SOUT'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
     def test_addition(self):
         """
         Test that correct instructions are generated for addition

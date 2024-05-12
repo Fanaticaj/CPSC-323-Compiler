@@ -776,6 +776,8 @@ class RDP:
           self.asm_instructions.append('LES')
         elif op == '>':
           self.asm_instructions.append('GRT')
+        elif op == '==':
+          self.asm_instructions.append('EQU')
       return True
     else:
       self.lexer.backtrack()
