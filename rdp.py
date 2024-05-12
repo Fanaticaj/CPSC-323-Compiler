@@ -557,9 +557,10 @@ class RDP:
           if self.token_is('separator', ';'):
             # Add POPM instruction to asm_instructions
             # Get mem address of identifer
-            if assign_type == 'integer' and not self.ignore_symbol_table and not self.is_checking_recursive(): # Temporary since only integers added to symbol table
-              mem_address = self.symbol_table.get_mem_address(id_tok)
-              self.asm_instructions.append(f"POPM {mem_address}")
+            if not self.is_checking_recursive() and not self.ignore_symbol_table:
+              if assign_type == 'integer' or id_tok.type == 'identifier':
+                mem_address = self.symbol_table.get_mem_address(id_tok)
+                self.asm_instructions.append(f"POPM {mem_address}")
             return True
           else:
             return False
@@ -801,6 +802,9 @@ class RDP:
       if self.term():
         if not self.is_checking_recursive() and not self.ignore_symbol_table:
           tok = self.lexer.get_prev_token()
+          if tok and tok.type == 'identifier':
+            mem_address = self.symbol_table.get_mem_address(tok)
+            self.asm_instructions.append(f'PUSHM {mem_address}')
           self.swap_last_two_instructions()
         if self.expression_prime():
           return True

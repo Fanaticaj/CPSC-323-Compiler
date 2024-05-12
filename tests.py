@@ -391,6 +391,7 @@ class TestRDP(unittest.TestCase):
         assign = "pi = 3.14 ;"
         l = Lexer(assign)
         parser = RDP(l)
+        parser.ignore_symbol_table = True
         is_assign = parser.assign()
         self.assertTrue(is_assign, f"Not recognized as Assign: {assign}")
         self.assertEqual(l.curr_token, len(l.tokens), f"Did not parse all tokens {l.curr_token}/{len(l.tokens)} in str: {assign}")
@@ -1217,6 +1218,33 @@ class TestAssemblyInstructions(unittest.TestCase):
         expected_instructions = [
             'PUSHM 5000',
             'PUSHI 1',
+            'A',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_addition_two_id(self):
+        """
+        Test addition with two identifiers
+        sum = sum + i;
+
+        PUSHM 5000
+        PUSHM 5001
+        A
+        POPM 5000
+        """
+        # Setup parser
+        source = "$$integer sum,i;$sum=sum+i;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'PUSHM 5000',
+            'PUSHM 5001',
             'A',
             'POPM 5000'
         ]
