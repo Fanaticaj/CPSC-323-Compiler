@@ -988,6 +988,40 @@ class TestCompiler(unittest.TestCase):
             if os.path.isfile(out_filename):
                 os.remove(out_filename)
 
+    def test_program_1_output(self):
+        """
+        Test that output of RAT24S_programs/program_1.txt is correct 
+        object code and symbol table
+        """
+        testcase_file = "RAT24S_programs/program_1.txt"
+        correct_output_file = "RAT24S_programs/res_1.txt"
+        out_filename = "output_1.txt"
+
+        # Raise error if testcase_file does not exist or out_filename exists
+        if not os.path.isfile(testcase_file):
+            raise ValueError(f"{testcase_file} not found")
+        if os.path.isfile(out_filename):
+            raise ValueError(f"{out_filename} already exists before testing")
+        
+        try:
+            # Run compiler
+            main(testcase_file, False, None, False, None, None, out_filename,
+                 None, supress_print=True)
+            
+            # Load correct output
+            with open(correct_output_file) as f:
+                correct_output = f.read()
+            
+            with open(out_filename) as f:
+                actual_output = f.read()
+
+            self.assertEqual(actual_output, correct_output)
+
+        finally:
+            # Remove out_filename
+            if os.path.isfile(out_filename):
+                os.remove(out_filename)
+
 class TestAssemblyInstructions(unittest.TestCase):
     """Test that assembly instructions are generated correctly"""
     def test_write_asm_instructions(self):

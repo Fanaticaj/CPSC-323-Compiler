@@ -140,6 +140,11 @@ class RDP:
     """Insert PUSHM instruction"""
     if not self.is_checking_recursive() and not self.ignore_symbol_table:
       prev_tok = self.lexer.get_prev_token()
+      if not self.symbol_table.exists_identifier(prev_tok):
+        err_msg = f"Error: Identifier {prev_tok.value} was not declared"
+        self.print_production(err_msg)
+        self.asm_instructions.append(err_msg)
+        return False
       mem_address = self.symbol_table.get_mem_address(prev_tok)
       self.asm_instructions.append(f"PUSHM {mem_address}")
 
@@ -559,6 +564,11 @@ class RDP:
             # Get mem address of identifer
             if not self.is_checking_recursive() and not self.ignore_symbol_table:
               if assign_type == 'integer' or id_tok.type == 'identifier':
+                if not self.symbol_table.exists_identifier(id_tok):
+                  err_msg = f"Error: Identifier {id_tok.value} was not declared"
+                  self.print_production(err_msg)
+                  self.asm_instructions.append(err_msg)
+                  return False
                 mem_address = self.symbol_table.get_mem_address(id_tok)
                 self.asm_instructions.append(f"POPM {mem_address}")
             return True
@@ -671,6 +681,11 @@ class RDP:
         if self.IDs():
           if not self.is_checking_recursive() and not self.ignore_symbol_table:
             id_tok = self.lexer.get_prev_token()
+            if not self.symbol_table.exists_identifier(id_tok):
+              err_msg = f"Error: Identifier {id_tok.value} was not declared"
+              self.print_production(err_msg)
+              self.asm_instructions.append(err_msg)
+              return False
             id_mem_address = self.symbol_table.get_mem_address(id_tok)
             self.asm_instructions.append(f"POPM {id_mem_address}")
           if self.token_is('separator', ')'):
@@ -747,18 +762,28 @@ class RDP:
     if self.expression():
       tok = self.lexer.get_prev_token()
       if tok.type == 'identifier':
+        if not self.symbol_table.exists_identifier(tok):
+          err_msg = f"Error: Identifier {tok.value} was not declared"
+          self.print_production(err_msg)
+          self.asm_instructions.append(err_msg)
+          return False
         self.insert_PUSHM()
       if self.relop():
         if self.expression():
           tok = self.lexer.get_prev_token()
           if tok.type == 'identifier':
+            if not self.symbol_table.exists_identifier(tok):
+              err_msg = f"Error: Identifier {tok.value} was not declared"
+              self.print_production(err_msg)
+              self.asm_instructions.append(err_msg)
+              return False
             self.insert_PUSHM()
           self.swap_last_two_instructions()
           if not self.is_checking_recursive():
             self.asm_instructions.append('JUMP0 UNDEFINED')
           return True
     return False
-  
+
   def relop(self):
     """
     R24. <Relop> ::= == | != | > | < | <= | =>
@@ -806,6 +831,11 @@ class RDP:
     """
     tok = self.lexer.tokens[self.lexer.curr_token - 2]
     if tok and tok.type == 'identifier':
+      if not self.symbol_table.exists_identifier(tok):
+        err_msg = f"Error: Identifier {tok.value} was not declared"
+        self.print_production(err_msg)
+        self.asm_instructions.append(err_msg)
+        return False
       mem_address = self.symbol_table.get_mem_address(tok)
       self.asm_instructions.append(f"PUSHM {mem_address}")
 
@@ -815,6 +845,11 @@ class RDP:
     """
     tok = self.lexer.get_prev_token()
     if tok and tok.type == 'identifier':
+      if not self.symbol_table.exists_identifier(tok):
+        err_msg = f"Error: Identifier {tok.value} was not declared"
+        self.print_production(err_msg)
+        self.asm_instructions.append(err_msg)
+        return False
       mem_address = self.symbol_table.get_mem_address(tok)
       self.asm_instructions.append(f'PUSHM {mem_address}')
 
