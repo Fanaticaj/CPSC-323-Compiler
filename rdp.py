@@ -813,8 +813,20 @@ class RDP:
       return False
     elif self.token_is('operator', '-'):
       self.print_production("<Expression_prime> --> - <Term> <Expression_prime>")
+      if not self.is_checking_recursive() and not self.ignore_symbol_table:
+        tok = self.lexer.tokens[self.lexer.curr_token - 2]
+        if tok and tok.type == 'identifier':
+          mem_address = self.symbol_table.get_mem_address(tok)
+          self.asm_instructions.append(f"PUSHM {mem_address}")
       if self.term():
+        if not self.is_checking_recursive() and not self.ignore_symbol_table:
+          tok = self.lexer.get_prev_token()
+          if tok and tok.type == 'identifier':
+            mem_address = self.symbol_table.get_mem_address(tok)
+            self.asm_instructions.append(f'PUSHM {mem_address}')
         if self.expression_prime():
+          if not self.is_checking_recursive() and not self.ignore_symbol_table:
+            self.asm_instructions.append('S')
           return True
       return False
     elif self.empty():

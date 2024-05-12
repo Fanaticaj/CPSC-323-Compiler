@@ -1303,6 +1303,80 @@ class TestAssemblyInstructions(unittest.TestCase):
         actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, expected_instructions)
 
+    def test_subtract(self):
+        """Test that subtract expressions generate correct instructions"""
+        # Setup parser
+        source = "$$integer diff;$diff = diff - 5;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions generated
+        expected_instructions = [
+            'PUSHM 5000',
+            'PUSHI 5',
+            'S',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_subtract_integers(self):
+        """
+        Test that subtract expressions with integers generate the correct
+        instructions
+        diff = 10 - 5;
+
+        PUSHI 10
+        PUSHI 5
+        S
+        POPM 5000
+        """
+        # Setup parser
+        source = "$$integer diff;$diff = 10 - 5;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions generated
+        expected_instructions = [
+            'PUSHI 10',
+            'PUSHI 5',
+            'S',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_subtract_ids(self):
+        """
+        Test that subtract expressions with identifers generate
+        the correct instructions
+        diff = i - j;
+
+        PUSHM 5001
+        PUSHM 5002
+        S
+        POPM 5000
+        """
+        # Setup parser
+        source = "$$integer diff,i,j;$diff = i - j;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions generated
+        expected_instructions = [
+            'PUSHM 5001',
+            'PUSHM 5002',
+            'S',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
 
 if __name__ == "__main__":
     unittest.main()
