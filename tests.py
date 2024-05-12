@@ -1279,5 +1279,30 @@ class TestAssemblyInstructions(unittest.TestCase):
         actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, expected_instructions)
 
+    def test_print(self):
+        """
+        Test that print statements correctly generate SOUT instructions
+        print
+
+        SOUT
+        """
+        # Setup parser
+        source = "$$integer sum,max;$print(sum+max);$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'PUSHM 5000',
+            'PUSHM 5001',
+            'A',
+            'SOUT'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+
 if __name__ == "__main__":
     unittest.main()

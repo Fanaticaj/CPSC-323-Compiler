@@ -646,6 +646,8 @@ class RDP:
         if self.expression():
           if self.token_is('separator', ')'):
             if self.token_is('separator', ';'):
+              if not self.is_checking_recursive():
+                self.asm_instructions.append('SOUT')
               return True
             else:
               return False
