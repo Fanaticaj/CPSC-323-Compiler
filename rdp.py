@@ -1003,9 +1003,13 @@ class RDP:
       return True
     elif self.token_is('keyword', 'true'):
       self.print_production('<Primary> --> true')
+      if not self.is_checking_recursive():
+        self.asm_instructions.append('PUSHI 1')
       return True
     elif self.token_is('keyword', 'false'):
       self.print_production('<Primary> --> false')
+      if not self.is_checking_recursive():
+        self.asm_instructions.append("PUSHI 0")
       return True
     return False
   

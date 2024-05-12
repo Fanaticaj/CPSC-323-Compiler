@@ -1,0 +1,23 @@
+1    SIN
+2    POPM 5000
+3    SIN
+4    POPM 5001
+5    SIN
+6    POPM 5002
+7    LABEL
+8    PUSHM 5000
+9    PUSHM 5001
+10   LEQ
+11   JUMP0 19
+12   PUSHM 5000
+13   SOUT
+14   PUSHM 5000
+15   PUSHM 5002
+16   A
+17   POPM 5000
+18   JUMP 7
+
+Identifier          Memory Location     Type
+low                 5000                integer
+high                5001                integer
+step                5002                integer

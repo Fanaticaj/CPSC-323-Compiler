@@ -1,0 +1,58 @@
+1    PUSHI 1
+2    POPM 5000
+3    PUSHI 2
+4    PUSHI 2
+5    A
+6    POPM 5001
+7    PUSHM 5000
+8    PUSHI 5
+9    A
+10   POPM 5002
+11   PUSHM 5000
+12   PUSHM 5002
+13   A
+14   POPM 5003
+15   SIN
+16   POPM 5000
+17   SIN
+18   POPM 5001
+19   PUSHM 5000
+20   SOUT
+21   PUSHM 5001
+22   PUSHI 3
+23   A
+24   SOUT
+25   PUSHI 1
+26   POPM 5006
+27   PUSHI 0
+28   POPM 5004
+29   LABEL
+30   PUSHM 5004
+31   PUSHI 10
+32   LES
+33   JUMP0 43
+34   PUSHM 5004
+35   SOUT
+36   PUSHM 5004
+37   PUSHI 1
+38   A
+39   POPM 5004
+40   PUSHI 0
+41   POPM 5006
+42   JUMP 29
+43   PUSHI 20
+44   PUSHM 5001
+45   M
+46   SOUT
+
+Identifier          Memory Location     Type
+var1                5000                integer
+var2                5001                integer
+var3                5002                integer
+var4                5003                integer
+var5                5004                integer
+var6                5005                boolean
+var7                5006                boolean
+var8                5007                boolean
+var9                5008                boolean
+var10               5009                boolean
