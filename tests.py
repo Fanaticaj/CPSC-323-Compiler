@@ -1444,5 +1444,68 @@ class TestAssemblyInstructions(unittest.TestCase):
         actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, expected_instructions)
 
+    def test_division(self):
+        """
+        Test that division generates correct instructions
+        """
+        # Setup parser
+        source = "$$integer prod,i;$prod = i / 100;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions generated
+        expected_instructions = [
+            'PUSHM 5001',
+            'PUSHI 100',
+            'D',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_division_integers(self):
+        """
+        Test that division of integers generates correct instructions
+        """
+        # Setup parser
+        source = "$$integer prod;$prod = 2 / 3;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions generated
+        expected_instructions = [
+            'PUSHI 2',
+            'PUSHI 3',
+            'D',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_division_ids(self):
+        """
+        Test that division of identifiers generates correct instructions
+        """
+        # Setup parser
+        source = "$$integer prod,i,j;$prod = i / j;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions generated
+        expected_instructions = [
+            'PUSHM 5001',
+            'PUSHM 5002',
+            'D',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
 if __name__ == "__main__":
     unittest.main()

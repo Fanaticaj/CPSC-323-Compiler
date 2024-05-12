@@ -868,8 +868,13 @@ class RDP:
       return False
     elif self.token_is('operator', '/'):
       self.print_production('<Term_prime> --> / <Factor> <Term_prime>')
+      if not self.is_checking_recursive() and not self.ignore_symbol_table:
+        self.insert_id_pushm_second()
       if self.factor():
         if self.term_prime():
+          if not self.is_checking_recursive() and not self.ignore_symbol_table:
+            self.insert_id_pushm_first()
+            self.asm_instructions.append('D')
           return True
       return False
     elif self.empty():
