@@ -1252,5 +1252,32 @@ class TestAssemblyInstructions(unittest.TestCase):
         actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, expected_instructions)
 
+    def test_addition_two_int(self):
+        """
+        Test addition with two integers
+        sum = 1 + 2;
+
+        PUSHI 1
+        PUSHI 2
+        A
+        POPM 5000
+        """
+        # Setup parser
+        source = "$$integer sum;$sum = 1 + 2;$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'PUSHI 1',
+            'PUSHI 2',
+            'A',
+            'POPM 5000'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
 if __name__ == "__main__":
     unittest.main()

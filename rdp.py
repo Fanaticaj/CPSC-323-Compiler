@@ -798,7 +798,7 @@ class RDP:
         if tok and tok.type == 'identifier':
           mem_address = self.symbol_table.get_mem_address(tok)
           self.asm_instructions.append(f"PUSHM {mem_address}")
-          self.asm_instructions.append('A')
+        self.asm_instructions.append('A')
       if self.term():
         if not self.is_checking_recursive() and not self.ignore_symbol_table:
           tok = self.lexer.get_prev_token()
