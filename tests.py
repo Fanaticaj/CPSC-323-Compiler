@@ -1167,7 +1167,7 @@ class TestAssemblyInstructions(unittest.TestCase):
             'PUSHI 0',
             'LES',
             'JUMP0 7',
-            'Jump 1',
+            'JUMP 1',
             'PUSHI 0',
             'POPM 5000'
         ]
@@ -1197,6 +1197,31 @@ class TestAssemblyInstructions(unittest.TestCase):
             'PUSHM 5001',
             'LES',
             'JUMP0 UNDEFINED'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_greater_than(self):
+        """
+        Test that greater than conditions generate correct instructions
+        """
+        # Setup parser
+        source = "$$integer i, max;$while(i > max) {return;}endwhile\nprint(1);$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'LABEL',
+            'PUSHM 5000',
+            'PUSHM 5001',
+            'GRT',
+            'JUMP0 7',
+            'JUMP 1',
+            'PUSHI 1',
+            'SOUT'
         ]
 
         actual_instructions = parser.asm_instructions

@@ -723,7 +723,7 @@ class RDP:
                 # Generate instruction to jump back to start of while loop
                 if not self.is_checking_recursive():
                   label_line_num = self.get_prev_label_line_num()
-                  self.asm_instructions.append(f"Jump {label_line_num}")
+                  self.asm_instructions.append(f"JUMP {label_line_num}")
                   # Update JUMP0 line number
                   self.update_prev_JUMP0_line_num()
                 return True
@@ -774,6 +774,8 @@ class RDP:
         # Insert LES instruction for < operator
         if op == '<':
           self.asm_instructions.append('LES')
+        elif op == '>':
+          self.asm_instructions.append('GRT')
       return True
     else:
       self.lexer.backtrack()
