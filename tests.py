@@ -1252,6 +1252,81 @@ class TestAssemblyInstructions(unittest.TestCase):
         actual_instructions = parser.asm_instructions
         self.assertEqual(actual_instructions, expected_instructions)
 
+    def test_not_equal_to(self):
+        """
+        Test that not equal to conditions generate correct instructions
+        """
+        # Setup parser
+        source = "$$integer i, max;$while(i != max) {return;}endwhile\nprint(1);$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'LABEL',
+            'PUSHM 5000',
+            'PUSHM 5001',
+            'NEQ',
+            'JUMP0 7',
+            'JUMP 1',
+            'PUSHI 1',
+            'SOUT'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_greater_equal_to(self):
+        """
+        Test that => conditions generate correct instructions
+        """
+        # Setup parser
+        source = "$$integer i, max;$while(i => max) {return;}endwhile\nprint(1);$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'LABEL',
+            'PUSHM 5000',
+            'PUSHM 5001',
+            'GEQ',
+            'JUMP0 7',
+            'JUMP 1',
+            'PUSHI 1',
+            'SOUT'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
+    def test_less_equal_to(self):
+        """
+        Test that <= conditions generate correct instructions
+        """
+        # Setup parser
+        source = "$$integer i, max;$while(i <= max) {return;}endwhile\nprint(1);$"
+        l = Lexer(source)
+        parser = RDP(l)
+        parser.rat24s()
+
+        # Assert correct instructions
+        expected_instructions = [
+            'LABEL',
+            'PUSHM 5000',
+            'PUSHM 5001',
+            'LEQ',
+            'JUMP0 7',
+            'JUMP 1',
+            'PUSHI 1',
+            'SOUT'
+        ]
+
+        actual_instructions = parser.asm_instructions
+        self.assertEqual(actual_instructions, expected_instructions)
+
     def test_addition(self):
         """
         Test that correct instructions are generated for addition
